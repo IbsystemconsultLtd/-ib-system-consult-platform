@@ -1,11 +1,11 @@
-# IB System Consult Ltd — Frontend
+# IB System Consult Ltd — Backend
 
-Static client-portal frontend for IB System Consult Ltd.
+Backend foundation for customer accounts, wallet records and service requests.
 
-## Files
-- `index.html` — page structure
-- `styles.css` — responsive styling
-- `app.js` — demo interactions
+## Deploy
+Use a Node.js host such as Render or Railway and a PostgreSQL database.
+Run `schema.sql`, then configure `DATABASE_URL`, `JWT_SECRET`, `FRONTEND_URL`, and `NODE_ENV=production`.
 
-## Important
-This is a frontend prototype. Authentication, database, wallet ledger, payment gateway and authorized NIN/BVN integrations must be connected on the backend before production use. Never put API secrets in this repository.
+Never commit `.env` or secret API keys to GitHub.
+
+Payment, identity-provider integrations, notifications and admin controls should be added as separate production stages using authorized providers.
