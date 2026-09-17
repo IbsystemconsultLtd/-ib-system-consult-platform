@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="IB System Consult Ltd — NIN, education and telecom support services.">
+  <title>IB System Consult Ltd</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark">IB</div>
+        <div><strong>IB SYSTEM</strong><span>CONSULT LTD</span></div>
+      </div>
+      <nav>
+        <a class="nav-link active" href="#home">⌂ <span>Overview</span></a>
+        <a class="nav-link" href="#services">▦ <span>Services</span></a>
+        <a class="nav-link" href="#requests">◷ <span>My Requests</span></a>
+        <a class="nav-link" href="#transactions">₦ <span>Transactions</span></a>
+        <a class="nav-link" href="#support">? <span>Support</span></a>
+      </nav>
+      <div class="side-note">
+        <b>Need help?</b>
+        <p>Chat with IB System Consult Ltd.</p>
+        <a href="https://wa.me/2349016587081" target="_blank" rel="noopener">WhatsApp support</a>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="menu-btn" id="menuBtn" aria-label="Open menu">☰</button>
+        <div>
+          <p class="eyebrow">CLIENT PORTAL</p>
+          <h1>Welcome to IB System Consult</h1>
+        </div>
+        <div class="top-actions">
+          <button class="icon-btn" title="Notifications">🔔</button>
+          <div class="avatar">IB</div>
+        </div>
+      </header>
+
+      <section class="hero" id="home">
+        <div>
+          <span class="badge">Professional • Convenient • Reliable</span>
+          <h2>Your trusted digital service partner.</h2>
+          <p>Access NIN support, education processing and telecom services from one simple platform.</p>
+          <a class="primary-btn" href="#services">Explore services</a>
+        </div>
+        <div class="hero-card">
+          <span>Available support</span>
+          <strong>Online</strong>
+          <small>WhatsApp: 0901 658 7081</small>
+        </div>
+      </section>
+
+      <section class="stats">
+        <div class="stat-card"><span>Wallet balance</span><strong>₦0.00</strong><button class="text-btn" data-modal="fundModal">Fund wallet →</button></div>
+        <div class="stat-card"><span>Open requests</span><strong>0</strong><small>Nothing pending</small></div>
+        <div class="stat-card"><span>Completed</span><strong>0</strong><small>Your completed requests</small></div>
+      </section>
+
+      <section id="services" class="section">
+        <div class="section-head"><div><p class="eyebrow">OUR SERVICES</p><h2>Choose a service</h2></div><span class="muted">Select a category to begin</span></div>
+        <div class="service-grid">
+          <article class="service-card" data-service="NIN Services"><div class="service-icon">🪪</div><h3>NIN Services</h3><p>Support for eligible NIN-related registration and modification requests.</p><button class="outline-btn">Start request</button></article>
+          <article class="service-card" data-service="Education Services"><div class="service-icon">🎓</div><h3>Education Services</h3><p>JAMB, O'Level, admission and other student processing support.</p><button class="outline-btn">Start request</button></article>
+          <article class="service-card" data-service="Telecom Services"><div class="service-icon">📱</div><h3>Telecom Services</h3><p>SIM registration support, SIM sales and selected telecom services.</p><button class="outline-btn">Start request</button></article>
+          <article class="service-card" data-service="BVN Services"><div class="service-icon">🏦</div><h3>BVN Services</h3><p>Assistance with eligible BVN-related requests through authorized channels.</p><button class="outline-btn">Start request</button></article>
+          <article class="service-card" data-service="Result Checking"><div class="service-icon">📄</div><h3>Result Checking</h3><p>Get assistance checking eligible examination or admission results.</p><button class="outline-btn">Start request</button></article>
+          <article class="service-card" data-service="Customer Support"><div class="service-icon">💬</div><h3>Customer Support</h3><p>Need something else? Contact our support team for guidance.</p><button class="outline-btn">Contact us</button></article>
+        </div>
+      </section>
+
+      <section id="requests" class="section">
+        <div class="section-head"><div><p class="eyebrow">REQUESTS</p><h2>Recent requests</h2></div></div>
+        <div class="empty-card"><div class="empty-icon">◷</div><h3>No requests yet</h3><p>Your service requests will appear here after you submit one.</p></div>
+      </section>
+
+      <section id="transactions" class="section">
+        <div class="section-head"><div><p class="eyebrow">WALLET</p><h2>Recent transactions</h2></div></div>
+        <div class="empty-card"><div class="empty-icon">₦</div><h3>No transactions yet</h3><p>Wallet funding and service payments will be listed here.</p></div>
+      </section>
+
+      <section id="support" class="support">
+        <div><p class="eyebrow">SUPPORT</p><h2>Need assistance?</h2><p>Reach IB System Consult Ltd directly for service guidance.</p></div>
+        <a class="primary-btn" href="https://wa.me/2349016587081" target="_blank" rel="noopener">Chat on WhatsApp</a>
+      </section>
+
+      <footer>© 2026 IB System Consult Ltd. All rights reserved.</footer>
+    </main>
+  </div>
+
+  <div class="modal" id="fundModal" aria-hidden="true">
+    <div class="modal-box">
+      <button class="close" data-close>×</button>
+      <p class="eyebrow">WALLET</p><h2>Fund your wallet</h2>
+      <label>Amount (₦)<input id="fundAmount" type="number" min="100" placeholder="e.g. 5000"></label>
+      <button class="primary-btn full" id="fundBtn">Continue to payment</button>
+      <p class="modal-note">Payment processing will be connected to your payment provider during backend setup.</p>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>
