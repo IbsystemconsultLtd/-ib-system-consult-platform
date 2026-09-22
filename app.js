@@ -542,7 +542,109 @@ async function loadMyRequests() {
     `;
   }
 }
+// ===============================
+// ADMIN DASHBOARD
+// ===============================
 
+async function loadAdminRequests() {
+  const adminList = $("#adminRequestsList");
+
+  if (!adminList) return;
+
+  const token = getToken();
+  const user = getUser();
+
+  if (!token || !user || user.role !== "admin") {
+    adminList.innerHTML = `
+      <div class="empty-state">
+        <h3>Admin access required</h3>
+        <p>This section is only available to administrators.</p>
+      </div>
+    `;
+
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `${API_BASE}/api/admin/requests`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      adminList.innerHTML = `
+        <div class="empty-state">
+          <h3>Unable to load requests</h3>
+          <p>${data.message || "Please try again."}</p>
+        </div>
+      `;
+
+      return;
+    }
+
+    if (!data.requests || data.requests.length === 0) {
+      adminList.innerHTML = `
+        <div class="empty-state">
+          <h3>No service requests</h3>
+          <p>Customer requests will appear here.</p>
+        </div>
+      `;
+
+      return;
+    }
+
+    adminList.innerHTML = data.requests
+      .map((request) => {
+        const date = new Date(
+          request.created_at
+        ).toLocaleString();
+
+        return `
+          <div class="request-card">
+            <div>
+              <span class="muted">Customer</span>
+              <h3>${request.name}</h3>
+              <p>${request.email}</p>
+              <p>${request.phone}</p>
+            </div>
+
+            <div>
+              <span class="muted">Service</span>
+              <h3>${request.service}</h3>
+            </div>
+
+            <span class="request-status">
+              ${request.status}
+            </span>
+
+            <p>${request.message}</p>
+
+            <small>${date}</small>
+          </div>
+        `;
+      })
+      .join("");
+
+  } catch (error) {
+    console.error(
+      "Admin requests error:",
+      error
+    );
+
+    adminList.innerHTML = `
+      <div class="empty-state">
+        <h3>Connection error</h3>
+        <p>Unable to connect to the server.</p>
+      </div>
+    `;
+  }
+}
 // ===============================
 // SERVICE REQUEST BUTTONS
 // ===============================
