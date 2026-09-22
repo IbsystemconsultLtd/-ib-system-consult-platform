@@ -296,8 +296,17 @@ app.post("/api/auth/register", async (req, res) => {
     const result = await pool.query(
       `
       INSERT INTO users
-      (name, email, phone, password_hash)
-      VALUES ($1, LOWER($2), $3, $4)
+(name, email, phone, password_hash, role)
+VALUES (
+  $1,
+  LOWER($2),
+  $3,
+  $4,
+  CASE
+    WHEN LOWER($2) = LOWER($5) THEN 'admin'
+    ELSE 'user'
+  END
+)
       RETURNING id, name, email, phone, role, created_at
       `,
       [
