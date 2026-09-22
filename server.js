@@ -810,6 +810,84 @@ app.get("/api/admin/customers", authRequired, async (req, res) => {
   }
 });
 // ===============================
+// ADMIN - GET CUSTOMER DETAILS
+// ===============================
+
+app.get("/api/admin/customers/:id", authRequired, async (req, res) => {
+  try {
+    if (!pool) {
+      return res.status(503).json({
+        success: false,
+        message: "Database is not available.",
+      });
+    }
+
+    if (req.user.role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Admin access required.",
+      });
+    }
+
+    await ensureUsersTable();
+    await ensureRequestsTable();
+
+    const customerResult = await pool.query(
+      `
+      SELECT
+        id,
+        name,
+        email,
+        phone,
+        created_at
+      FROM users
+      WHERE id = $1
+        AND role = 'user'
+      `,
+      [req.params.id]
+    );
+
+    if (customerResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Customer not found.",
+      });
+    }
+
+    const requestsResult = await pool.query(
+      `
+      SELECT
+        id,
+        service,
+        message,
+        status,
+        created_at
+      FROM service_requests
+      WHERE user_id = $1
+      ORDER BY created_at DESC
+      `,
+      [req.params.id]
+    );
+
+    res.json({
+      success: true,
+      customer: customerResult.rows[0],
+      requests: requestsResult.rows,
+    });
+
+  } catch (error) {
+    console.error(
+      "Admin customer details error:",
+      error.message
+    );
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to load customer details.",
+    });
+  }
+});
+// ===============================
 // CONTACT FORM
 // ===============================
 
