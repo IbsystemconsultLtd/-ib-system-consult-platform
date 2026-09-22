@@ -391,7 +391,96 @@ if (loginForm) {
     }
   });
 }
+// ===============================
+// MY REQUESTS
+// ===============================
 
+async function loadMyRequests() {
+  const requestsList = $("#requestsList");
+
+  if (!requestsList) return;
+
+  const token = getToken();
+
+  if (!token) {
+    requestsList.innerHTML = `
+      <div class="empty-state">
+        <h3>Login required</h3>
+        <p>Please log in to view your service requests.</p>
+      </div>
+    `;
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `${API_BASE}/api/requests`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      requestsList.innerHTML = `
+        <div class="empty-state">
+          <h3>Unable to load requests</h3>
+          <p>${data.message || "Please try again."}</p>
+        </div>
+      `;
+      return;
+    }
+
+    if (!data.requests || data.requests.length === 0) {
+      requestsList.innerHTML = `
+        <div class="empty-state">
+          <h3>No requests yet</h3>
+          <p>Your service requests will appear here.</p>
+        </div>
+      `;
+      return;
+    }
+
+    requestsList.innerHTML = data.requests
+      .map((request) => {
+        const date = new Date(
+          request.created_at
+        ).toLocaleString();
+
+        return `
+          <div class="request-card">
+            <div>
+              <span class="muted">Service</span>
+              <h3>${request.service}</h3>
+            </div>
+
+            <span class="request-status">
+              ${request.status}
+            </span>
+
+            <p>${request.message}</p>
+
+            <small>${date}</small>
+          </div>
+        `;
+      })
+      .join("");
+  } catch (error) {
+    console.error("My requests error:", error);
+
+    requestsList.innerHTML = `
+      <div class="empty-state">
+        <h3>Connection error</h3>
+        <p>Unable to connect to the server.</p>
+      </div>
+    `;
+  }
+}
+
+loadMyRequests();
 // ===============================
 // SERVICE REQUEST BUTTONS
 // ===============================
