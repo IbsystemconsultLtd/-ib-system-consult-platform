@@ -573,6 +573,57 @@ app.get("/api/requests", authRequired, async (req, res) => {
   }
 });
 // ===============================
+// ADMIN - GET ALL SERVICE REQUESTS
+// ===============================
+
+app.get("/api/admin/requests", authRequired, async (req, res) => {
+  try {
+    if (!pool) {
+      return res.status(503).json({
+        success: false,
+        message: "Database is not available.",
+      });
+    }
+
+    if (req.user.role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Admin access required.",
+      });
+    }
+
+    await ensureRequestsTable();
+
+    const result = await pool.query(`
+      SELECT
+        service_requests.id,
+        service_requests.service,
+        service_requests.message,
+        service_requests.status,
+        service_requests.created_at,
+        users.name,
+        users.email,
+        users.phone
+      FROM service_requests
+      JOIN users
+        ON users.id = service_requests.user_id
+      ORDER BY service_requests.created_at DESC
+    `);
+
+    res.json({
+      success: true,
+      requests: result.rows,
+    });
+  } catch (error) {
+    console.error("Admin requests error:", error.message);
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to load admin requests.",
+    });
+  }
+});
+// ===============================
 // CONTACT FORM
 // ===============================
 
