@@ -1035,6 +1035,16 @@ document.addEventListener("click", async (event) => {
     toast("Unable to connect to the server.");
   }
 });
+document.addEventListener("click", (event) => {
+  if (event.target.id === "closeCustomerProfile") {
+    const modal = $("#customerProfileModal");
+
+    if (modal) {
+      modal.classList.remove("show");
+      modal.setAttribute("aria-hidden", "true");
+    }
+  }
+});
 // ===============================
 // ADMIN - LOAD CUSTOMERS
 // ===============================
