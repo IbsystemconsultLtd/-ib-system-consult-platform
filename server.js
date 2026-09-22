@@ -461,7 +461,7 @@ app.get("/api/auth/me", authRequired, async (req, res) => {
 
     const result = await pool.query(
       `
-      SELECT id, name, email, phone, role, created_at
+      SELECT id, name, email, phone, role, wallet_balance, created_at
       FROM users
       WHERE id = $1
       LIMIT 1
