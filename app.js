@@ -863,7 +863,7 @@ ${message}`,
 // FUNDING BUTTON
 // ===============================
 
-const const fundBtn = $("#fundBtn");
+const fundBtn = $("#fundBtn");
 
 if (fundBtn) {
   fundBtn.addEventListener("click", async () => {
@@ -896,7 +896,7 @@ if (fundBtn) {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            amount,
+            amount: amount,
           }),
         }
       );
@@ -908,7 +908,6 @@ if (fundBtn) {
           data.message ||
           "Unable to start payment."
         );
-
         return;
       }
 
@@ -931,31 +930,6 @@ if (fundBtn) {
         "Continue to payment";
     }
   });
-}
-      const amount = Number(
-        $("#fundAmount")?.value
-      );
-
-      if (!amount || amount < 100) {
-        toast(
-          "Enter an amount of at least ₦100."
-        );
-
-        return;
-      }
-
-      toast(
-        "Payment gateway will be connected later."
-      );
-
-      const fundModal =
-        $("#fundModal");
-
-      if (fundModal) {
-        fundModal.classList.remove("show");
-      }
-    }
-  );
 }
 
 // ===============================
