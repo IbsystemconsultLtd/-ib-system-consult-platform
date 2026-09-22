@@ -58,6 +58,18 @@ async function ensureUsersTable() {
   `);
 }
 // ===============================
+// WALLET BALANCE
+// ===============================
+
+async function ensureWalletColumn() {
+  if (!pool) return;
+
+  await pool.query(`
+    ALTER TABLE users
+    ADD COLUMN IF NOT EXISTS wallet_balance NUMERIC(12,2) NOT NULL DEFAULT 0
+  `);
+}
+// ===============================
 // SERVICE REQUESTS TABLE
 // ===============================
 
