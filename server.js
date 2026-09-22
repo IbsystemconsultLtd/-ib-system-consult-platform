@@ -758,6 +758,58 @@ app.get("/api/admin/stats", authRequired, async (req, res) => {
   }
 });
 // ===============================
+// ADMIN - GET ALL CUSTOMERS
+// ===============================
+
+app.get("/api/admin/customers", authRequired, async (req, res) => {
+  try {
+    if (!pool) {
+      return res.status(503).json({
+        success: false,
+        message: "Database is not available.",
+      });
+    }
+
+    if (req.user.role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Admin access required.",
+      });
+    }
+
+    await ensureUsersTable();
+
+    const result = await pool.query(`
+      SELECT
+        id,
+        name,
+        email,
+        phone,
+        role,
+        created_at
+      FROM users
+      WHERE role = 'user'
+      ORDER BY created_at DESC
+    `);
+
+    res.json({
+      success: true,
+      customers: result.rows,
+    });
+
+  } catch (error) {
+    console.error(
+      "Admin customers error:",
+      error.message
+    );
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to load customers.",
+    });
+  }
+});
+// ===============================
 // CONTACT FORM
 // ===============================
 
