@@ -57,7 +57,24 @@ async function ensureUsersTable() {
     )
   `);
 }
+// ===============================
+// SERVICE REQUESTS TABLE
+// ===============================
 
+async function ensureRequestsTable() {
+  if (!pool) return;
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS service_requests (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+      service VARCHAR(150) NOT NULL,
+      message TEXT NOT NULL,
+      status VARCHAR(30) NOT NULL DEFAULT 'pending',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+    }
 // ===============================
 // AUTHENTICATION HELPERS
 // ===============================
