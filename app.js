@@ -619,9 +619,22 @@ async function loadAdminRequests() {
               <h3>${request.service}</h3>
             </div>
 
-            <span class="request-status">
-              ${request.status}
-            </span>
+           <select
+  class="request-status-select"
+  data-request-id="${request.id}"
+>
+  <option value="pending" ${request.status === "pending" ? "selected" : ""}>
+    Pending
+  </option>
+
+  <option value="processing" ${request.status === "processing" ? "selected" : ""}>
+    Processing
+  </option>
+
+  <option value="completed" ${request.status === "completed" ? "selected" : ""}>
+    Completed
+  </option>
+</select>
 
             <p>${request.message}</p>
 
