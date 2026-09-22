@@ -951,4 +951,5 @@ document.addEventListener("change", async (event) => {
 });
 if (getUser()?.role === "admin") {
   loadAdminRequests();
+  loadAdminStats();
 }
