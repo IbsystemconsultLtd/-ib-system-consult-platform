@@ -953,3 +953,86 @@ if (getUser()?.role === "admin") {
   loadAdminRequests();
   loadAdminStats();
 }
+// ===============================
+// ADMIN - LOAD CUSTOMERS
+// ===============================
+
+async function loadAdminCustomers() {
+  const customersList = $("#adminCustomersList");
+
+  if (!customersList) return;
+
+  const token = getToken();
+  const user = getUser();
+
+  if (!token || !user || user.role !== "admin") {
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `${API_BASE}/api/admin/customers`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      customersList.innerHTML = `
+        <div class="empty-state">
+          <h3>Unable to load customers</h3>
+          <p>${data.message || "Please try again."}</p>
+        </div>
+      `;
+      return;
+    }
+
+    if (!data.customers || data.customers.length === 0) {
+      customersList.innerHTML = `
+        <div class="empty-state">
+          <h3>No customers yet</h3>
+          <p>Registered customers will appear here.</p>
+        </div>
+      `;
+      return;
+    }
+
+    customersList.innerHTML = data.customers
+      .map((customer) => {
+        const date = new Date(
+          customer.created_at
+        ).toLocaleString();
+
+        return `
+          <div class="request-card">
+            <div>
+              <span class="muted">Customer</span>
+              <h3>${customer.name}</h3>
+              <p>${customer.email}</p>
+              <p>${customer.phone}</p>
+            </div>
+
+            <small>Joined: ${date}</small>
+          </div>
+        `;
+      })
+      .join("");
+
+  } catch (error) {
+    console.error(
+      "Admin customers error:",
+      error
+    );
+
+    customersList.innerHTML = `
+      <div class="empty-state">
+        <h3>Connection error</h3>
+        <p>Unable to connect to the server.</p>
+      </div>
+    `;
+  }
+        }
