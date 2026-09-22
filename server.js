@@ -95,7 +95,9 @@ app.post("/api/requests",auth,async(req,res)=>{
   res.status(201).json({request:r.rows[0]});
 });
 app.use((_req,res)=>res.status(404).json({error:"Endpoint not found."}));
-
+app.listen(port, () => {
+  console.log("IB System Consult API listening on port " + port);
+});
 async function initDatabase() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
