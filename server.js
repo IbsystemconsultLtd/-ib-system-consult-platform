@@ -42,7 +42,8 @@ if (process.env.DATABASE_URL) {
 // DATABASE TABLES
 // ===============================
 
-async function ensureUsersTable() {// ===============================
+async function ensureUsersTable() {
+// ===============================
 // SERVICE REQUESTS TABLE
 // ===============================
 
