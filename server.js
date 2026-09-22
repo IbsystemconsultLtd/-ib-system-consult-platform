@@ -74,7 +74,7 @@ async function ensureRequestsTable() {
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
-    }
+}
 // ===============================
 // AUTHENTICATION HELPERS
 // ===============================
