@@ -954,7 +954,7 @@ if (getUser()?.role === "admin") {
   loadAdminStats();
   loadAdminCustomers();
 }
-document.addEventListener("click", (event) => {
+document.addEventListener("click", async (event) => {
   if (!event.target.classList.contains("customer-view-btn")) {
     return;
   }
@@ -962,7 +962,60 @@ document.addEventListener("click", (event) => {
   const customerId =
     event.target.dataset.customerId;
 
-  alert(`Customer ID: ${customerId}`);
+  const token = getToken();
+
+  if (!token || !customerId) {
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `${API_BASE}/api/admin/customers/${customerId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      toast(
+        data.message || "Unable to load customer."
+      );
+      return;
+    }
+
+    const customer = data.customer;
+
+    let requestsText = "No service requests yet.";
+
+    if (data.requests && data.requests.length > 0) {
+      requestsText = data.requests
+        .map(
+          (request) =>
+            `${request.service} — ${request.status}`
+        )
+        .join("\n");
+    }
+
+    alert(
+      `Customer Details\n\n` +
+      `Name: ${customer.name}\n` +
+      `Email: ${customer.email}\n` +
+      `Phone: ${customer.phone}\n\n` +
+      `Service Requests:\n${requestsText}`
+    );
+
+  } catch (error) {
+    console.error(
+      "Customer details error:",
+      error
+    );
+
+    toast("Unable to connect to the server.");
+  }
 });
 // ===============================
 // ADMIN - LOAD CUSTOMERS
