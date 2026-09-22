@@ -1016,7 +1016,12 @@ async function loadAdminCustomers() {
               <p>${customer.email}</p>
               <p>${customer.phone}</p>
             </div>
-
+<button
+  class="customer-view-btn"
+  data-customer-id="${customer.id}"
+>
+  View Customer
+</button>
             <small>Joined: ${date}</small>
           </div>
         `;
