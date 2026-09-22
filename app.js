@@ -954,6 +954,16 @@ if (getUser()?.role === "admin") {
   loadAdminStats();
   loadAdminCustomers();
 }
+document.addEventListener("click", (event) => {
+  if (!event.target.classList.contains("customer-view-btn")) {
+    return;
+  }
+
+  const customerId =
+    event.target.dataset.customerId;
+
+  alert(`Customer ID: ${customerId}`);
+});
 // ===============================
 // ADMIN - LOAD CUSTOMERS
 // ===============================
