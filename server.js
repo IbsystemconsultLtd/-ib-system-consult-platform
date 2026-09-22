@@ -694,6 +694,70 @@ app.patch("/api/admin/requests/:id/status", authRequired, async (req, res) => {
   }
 });
 // ===============================
+// ADMIN - DASHBOARD STATISTICS
+// ===============================
+
+app.get("/api/admin/stats", authRequired, async (req, res) => {
+  try {
+    if (!pool) {
+      return res.status(503).json({
+        success: false,
+        message: "Database is not available.",
+      });
+    }
+
+    if (req.user.role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Admin access required.",
+      });
+    }
+
+    await ensureRequestsTable();
+    await ensureUsersTable();
+
+    const requestsResult = await pool.query(`
+      SELECT
+        COUNT(*)::int AS total_requests,
+        COUNT(*) FILTER (
+          WHERE status = 'pending'
+        )::int AS pending_requests,
+        COUNT(*) FILTER (
+          WHERE status = 'processing'
+        )::int AS processing_requests,
+        COUNT(*) FILTER (
+          WHERE status = 'completed'
+        )::int AS completed_requests
+      FROM service_requests
+    `);
+
+    const usersResult = await pool.query(`
+      SELECT COUNT(*)::int AS total_customers
+      FROM users
+      WHERE role = 'user'
+    `);
+
+    res.json({
+      success: true,
+      stats: {
+        ...requestsResult.rows[0],
+        total_customers: usersResult.rows[0].total_customers,
+      },
+    });
+
+  } catch (error) {
+    console.error(
+      "Admin stats error:",
+      error.message
+    );
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to load dashboard statistics.",
+    });
+  }
+});
+// ===============================
 // CONTACT FORM
 // ===============================
 
