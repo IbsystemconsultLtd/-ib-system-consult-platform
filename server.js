@@ -407,9 +407,16 @@ app.post("/api/auth/login", async (req, res) => {
       });
     }
 
-    delete user.password_hash;
+    if (
+  process.env.ADMIN_EMAIL &&
+  user.email.toLowerCase() === process.env.ADMIN_EMAIL.toLowerCase()
+) {
+  user.role = "admin";
+}
 
-    const token = createToken(user);
+delete user.password_hash;
+
+const token = createToken(user);
 
     res.json({
       success: true,
