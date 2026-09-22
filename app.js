@@ -991,7 +991,29 @@ document.addEventListener("click", async (event) => {
 
     $("#profileCustomerPhone").textContent =
       customer.phone;
+const cleanPhone =
+  customer.phone.replace(/\D/g, "");
 
+const whatsappPhone =
+  cleanPhone.startsWith("0")
+    ? "234" + cleanPhone.slice(1)
+    : cleanPhone;
+
+const whatsappBtn =
+  $("#profileWhatsAppBtn");
+
+const callBtn =
+  $("#profileCallBtn");
+
+if (whatsappBtn) {
+  whatsappBtn.href =
+    `https://wa.me/${whatsappPhone}`;
+}
+
+if (callBtn) {
+  callBtn.href =
+    `tel:${customer.phone}`;
+}
     $("#profileCustomerJoined").textContent =
       new Date(customer.created_at).toLocaleDateString();
 
