@@ -1082,6 +1082,158 @@ app.post("/api/wallet/fund", authRequired, async (req, res) => {
     });
   }
 });
+// ===============================
+// PAYSTACK: VERIFY PAYMENT
+// ===============================
+
+app.get("/api/wallet/verify/:reference", authRequired, async (req, res) => {
+  try {
+    if (!pool) {
+      return res.status(503).json({
+        success: false,
+        message: "Database is not available.",
+      });
+    }
+
+    if (!PAYSTACK_SECRET_KEY) {
+      return res.status(500).json({
+        success: false,
+        message: "Payment gateway is not configured.",
+      });
+    }
+
+    const reference = req.params.reference;
+
+    const response = await fetch(
+      `https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
+        },
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || !data.status) {
+      return res.status(502).json({
+        success: false,
+        message: "Unable to verify payment.",
+      });
+    }
+
+    const transaction = data.data;
+
+    if (transaction.status !== "success") {
+      return res.status(400).json({
+        success: false,
+        message: "Payment was not successful.",
+      });
+    }
+
+    const paidAmount = Number(transaction.amount) / 100;
+    const paidUserId =
+      transaction.metadata?.user_id;
+
+    if (
+      !paidUserId ||
+      Number(paidUserId) !== Number(req.user.id)
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "Payment does not belong to this account.",
+      });
+    }
+
+    // Prevent the same payment reference
+    // from being credited more than once.
+    const referenceCheck = await pool.query(
+      `
+      CREATE TABLE IF NOT EXISTS wallet_transactions (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        reference VARCHAR(150) UNIQUE NOT NULL,
+        amount NUMERIC(12,2) NOT NULL,
+        status VARCHAR(30) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+      `
+    );
+
+    const existing = await pool.query(
+      `
+      SELECT id
+      FROM wallet_transactions
+      WHERE reference = $1
+      `,
+      [reference]
+    );
+
+    if (existing.rows.length > 0) {
+      return res.json({
+        success: true,
+        message: "Payment has already been credited.",
+        amount: paidAmount,
+      });
+    }
+
+    const client = await pool.connect();
+
+    try {
+      await client.query("BEGIN");
+
+      await client.query(
+        `
+        UPDATE users
+        SET wallet_balance =
+          wallet_balance + $1
+        WHERE id = $2
+        `,
+        [paidAmount, req.user.id]
+      );
+
+      await client.query(
+        `
+        INSERT INTO wallet_transactions
+          (user_id, reference, amount, status)
+        VALUES
+          ($1, $2, $3, 'success')
+        `,
+        [
+          req.user.id,
+          reference,
+          paidAmount,
+        ]
+      );
+
+      await client.query("COMMIT");
+
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
+
+    res.json({
+      success: true,
+      message: "Wallet funded successfully.",
+      amount: paidAmount,
+    });
+
+  } catch (error) {
+    console.error(
+      "Wallet payment verification error:",
+      error.message
+    );
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to verify wallet payment.",
+    });
+  }
+});
 app.listen(PORT, "0.0.0.0", () => {
   console.log(
     `IB System Consult API listening on port ${PORT}`
