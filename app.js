@@ -659,6 +659,87 @@ async function loadAdminRequests() {
   }
 }
 // ===============================
+// ADMIN - LOAD DASHBOARD STATS
+// ===============================
+
+async function loadAdminStats() {
+  const token = getToken();
+  const user = getUser();
+
+  if (!token || !user || user.role !== "admin") {
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `${API_BASE}/api/admin/stats`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error(
+        "Admin stats error:",
+        data.message
+      );
+      return;
+    }
+
+    const stats = data.stats;
+
+    const totalCustomers =
+      $("#adminTotalCustomers");
+
+    const totalRequests =
+      $("#adminTotalRequests");
+
+    const pendingRequests =
+      $("#adminPendingRequests");
+
+    const processingRequests =
+      $("#adminProcessingRequests");
+
+    const completedRequests =
+      $("#adminCompletedRequests");
+
+    if (totalCustomers) {
+      totalCustomers.textContent =
+        stats.total_customers;
+    }
+
+    if (totalRequests) {
+      totalRequests.textContent =
+        stats.total_requests;
+    }
+
+    if (pendingRequests) {
+      pendingRequests.textContent =
+        stats.pending_requests;
+    }
+
+    if (processingRequests) {
+      processingRequests.textContent =
+        stats.processing_requests;
+    }
+
+    if (completedRequests) {
+      completedRequests.textContent =
+        stats.completed_requests;
+    }
+
+  } catch (error) {
+    console.error(
+      "Admin stats connection error:",
+      error
+    );
+  }
+}
+// ===============================
 // SERVICE REQUEST BUTTONS
 // ===============================
 
