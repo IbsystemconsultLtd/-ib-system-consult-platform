@@ -1057,11 +1057,18 @@ app.post("/api/wallet/fund", authRequired, async (req, res) => {
     const data = await response.json();
 
     if (!response.ok || !data.status) {
-      console.error("Paystack initialization failed:", data);
-      return res.status(502).json({
-        success: false,
-        message: "Unable to initialize payment.",
-      });
+  console.error(
+    "Paystack initialization failed:",
+    data
+  );
+
+  return res.status(502).json({
+    success: false,
+    message:
+      data.message ||
+      data.data?.message ||
+      "Unable to initialize payment.",
+  });
     }
 
     res.json({
