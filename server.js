@@ -986,6 +986,102 @@ if (pool) {
     );
   });
 }
+// ===============================
+// PAYSTACK: INITIALIZE PAYMENT
+// ===============================
+
+app.post("/api/wallet/fund", authRequired, async (req, res) => {
+  try {
+    if (!pool) {
+      return res.status(503).json({
+        success: false,
+        message: "Database is not available.",
+      });
+    }
+
+    if (!PAYSTACK_SECRET_KEY) {
+      return res.status(500).json({
+        success: false,
+        message: "Payment gateway is not configured.",
+      });
+    }
+
+    const amount = Number(req.body.amount);
+
+    if (!Number.isFinite(amount) || amount < 100) {
+      return res.status(400).json({
+        success: false,
+        message: "Minimum wallet funding is ₦100.",
+      });
+    }
+
+    await ensureWalletColumn();
+
+    const userResult = await pool.query(
+      `
+      SELECT id, name, email
+      FROM users
+      WHERE id = $1
+      `,
+      [req.user.id]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "User account not found.",
+      });
+    }
+
+    const user = userResult.rows[0];
+
+    const response = await fetch(
+      "https://api.paystack.co/transaction/initialize",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: user.email,
+          amount: Math.round(amount * 100),
+          metadata: {
+            user_id: user.id,
+            purpose: "wallet_funding",
+          },
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || !data.status) {
+      console.error("Paystack initialization failed:", data);
+      return res.status(502).json({
+        success: false,
+        message: "Unable to initialize payment.",
+      });
+    }
+
+    res.json({
+      success: true,
+      authorization_url: data.data.authorization_url,
+      reference: data.data.reference,
+    });
+
+  } catch (error) {
+    console.error(
+      "Wallet funding error:",
+      error.message
+    );
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to start payment.",
+    });
+  }
+});
 app.listen(PORT, "0.0.0.0", () => {
   console.log(
     `IB System Consult API listening on port ${PORT}`
