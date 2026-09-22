@@ -959,14 +959,10 @@ document.addEventListener("click", async (event) => {
     return;
   }
 
-  const customerId =
-    event.target.dataset.customerId;
-
+  const customerId = event.target.dataset.customerId;
   const token = getToken();
 
-  if (!token || !customerId) {
-    return;
-  }
+  if (!token || !customerId) return;
 
   try {
     const response = await fetch(
@@ -981,36 +977,58 @@ document.addEventListener("click", async (event) => {
     const data = await response.json();
 
     if (!response.ok) {
-      toast(
-        data.message || "Unable to load customer."
-      );
+      toast(data.message || "Unable to load customer.");
       return;
     }
 
     const customer = data.customer;
 
-    let requestsText = "No service requests yet.";
+    $("#profileCustomerName").textContent =
+      customer.name;
 
-    if (data.requests && data.requests.length > 0) {
-      requestsText = data.requests
+    $("#profileCustomerEmail").textContent =
+      customer.email;
+
+    $("#profileCustomerPhone").textContent =
+      customer.phone;
+
+    $("#profileCustomerJoined").textContent =
+      new Date(customer.created_at).toLocaleDateString();
+
+    const requestsBox =
+      $("#profileCustomerRequests");
+
+    if (!data.requests || data.requests.length === 0) {
+      requestsBox.innerHTML =
+        `<p class="muted">No service requests yet.</p>`;
+    } else {
+      requestsBox.innerHTML = data.requests
         .map(
-          (request) =>
-            `${request.service} — ${request.status}`
+          (request) => `
+            <div class="request-card">
+              <h3>${request.service}</h3>
+              <p>${request.message}</p>
+              <strong>Status: ${request.status}</strong>
+              <small>
+                ${new Date(
+                  request.created_at
+                ).toLocaleString()}
+              </small>
+            </div>
+          `
         )
-        .join("\n");
+        .join("");
     }
 
-    alert(
-      `Customer Details\n\n` +
-      `Name: ${customer.name}\n` +
-      `Email: ${customer.email}\n` +
-      `Phone: ${customer.phone}\n\n` +
-      `Service Requests:\n${requestsText}`
+    $("#customerProfileModal").classList.add("show");
+    $("#customerProfileModal").setAttribute(
+      "aria-hidden",
+      "false"
     );
 
   } catch (error) {
     console.error(
-      "Customer details error:",
+      "Customer profile error:",
       error
     );
 
