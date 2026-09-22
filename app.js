@@ -135,6 +135,8 @@ if (authBtn) {
       if (shouldLogout) {
         clearAuth();
         updateAuthUI();
+        loadAccountDashboard();
+        loadMyRequests();
         toast("You have been logged out.");
       }
 
@@ -146,6 +148,7 @@ if (authBtn) {
 }
 
 updateAuthUI();
+
 // ===============================
 // ACCOUNT DASHBOARD
 // ===============================
@@ -161,12 +164,16 @@ async function loadAccountDashboard() {
 
   if (!token) {
     if (accountName) accountName.textContent = "Guest";
+
     if (accountEmail) {
-      accountEmail.textContent = "Please log in to view your account.";
+      accountEmail.textContent =
+        "Please log in to view your account.";
     }
+
     if (accountPhone) accountPhone.textContent = "—";
     if (accountRole) accountRole.textContent = "Client";
     if (accountAvatar) accountAvatar.textContent = "IB";
+
     return;
   }
 
@@ -190,7 +197,10 @@ async function loadAccountDashboard() {
 
     const user = data.user;
 
-    localStorage.setItem(USER_KEY, JSON.stringify(user));
+    localStorage.setItem(
+      USER_KEY,
+      JSON.stringify(user)
+    );
 
     if (accountName) {
       accountName.textContent = user.name;
@@ -206,7 +216,9 @@ async function loadAccountDashboard() {
 
     if (accountRole) {
       accountRole.textContent =
-        user.role === "admin" ? "Administrator" : "Client";
+        user.role === "admin"
+          ? "Administrator"
+          : "Client";
     }
 
     if (accountAvatar) {
@@ -216,11 +228,13 @@ async function loadAccountDashboard() {
 
     updateAuthUI();
   } catch (error) {
-    console.error("Account dashboard error:", error);
+    console.error(
+      "Account dashboard error:",
+      error
+    );
   }
 }
 
-loadAccountDashboard();
 // ===============================
 // LOGIN / REGISTER SWITCH
 // ===============================
@@ -233,15 +247,25 @@ const showLogin = $("#showLogin");
 
 if (showRegister) {
   showRegister.addEventListener("click", () => {
-    if (loginView) loginView.style.display = "none";
-    if (registerView) registerView.style.display = "block";
+    if (loginView) {
+      loginView.style.display = "none";
+    }
+
+    if (registerView) {
+      registerView.style.display = "block";
+    }
   });
 }
 
 if (showLogin) {
   showLogin.addEventListener("click", () => {
-    if (registerView) registerView.style.display = "none";
-    if (loginView) loginView.style.display = "block";
+    if (registerView) {
+      registerView.style.display = "none";
+    }
+
+    if (loginView) {
+      loginView.style.display = "block";
+    }
   });
 }
 
@@ -252,75 +276,91 @@ if (showLogin) {
 const registerForm = $("#registerForm");
 
 if (registerForm) {
-  registerForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
+  registerForm.addEventListener(
+    "submit",
+    async (event) => {
+      event.preventDefault();
 
-    const name = $("#registerName")?.value.trim();
-    const email = $("#registerEmail")?.value.trim();
-    const phone = $("#registerPhone")?.value.trim();
-    const password = $("#registerPassword")?.value;
+      const name = $("#registerName")?.value.trim();
+      const email = $("#registerEmail")?.value.trim();
+      const phone = $("#registerPhone")?.value.trim();
+      const password = $("#registerPassword")?.value;
 
-    if (!name || !email || !phone || !password) {
-      toast("Please complete all fields.");
-      return;
-    }
-
-    if (password.length < 8) {
-      toast("Password must be at least 8 characters.");
-      return;
-    }
-
-    const submitButton = registerForm.querySelector(
-      'button[type="submit"]'
-    );
-
-    if (submitButton) {
-      submitButton.disabled = true;
-      submitButton.textContent = "Creating account...";
-    }
-
-    try {
-      const response = await fetch(
-        `${API_BASE}/api/auth/register`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name,
-            email,
-            phone,
-            password,
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        toast(data.message || "Unable to create account.");
+      if (!name || !email || !phone || !password) {
+        toast("Please complete all fields.");
         return;
       }
 
-      saveAuth(data.token, data.user);
-      updateAuthUI();
+      if (password.length < 8) {
+        toast(
+          "Password must be at least 8 characters."
+        );
+        return;
+      }
 
-      registerForm.reset();
+      const submitButton =
+        registerForm.querySelector(
+          'button[type="submit"]'
+        );
 
-      authModal?.classList.remove("show");
-
-      toast("Account created successfully.");
-    } catch (error) {
-      console.error(error);
-      toast("Unable to connect to the server.");
-    } finally {
       if (submitButton) {
-        submitButton.disabled = false;
-        submitButton.textContent = "Create Account";
+        submitButton.disabled = true;
+        submitButton.textContent =
+          "Creating account...";
+      }
+
+      try {
+        const response = await fetch(
+          `${API_BASE}/api/auth/register`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              name,
+              email,
+              phone,
+              password,
+            }),
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          toast(
+            data.message ||
+              "Unable to create account."
+          );
+          return;
+        }
+
+        saveAuth(data.token, data.user);
+
+        updateAuthUI();
+        await loadAccountDashboard();
+        await loadMyRequests();
+
+        registerForm.reset();
+
+        authModal?.classList.remove("show");
+
+        toast("Account created successfully.");
+      } catch (error) {
+        console.error(error);
+        toast(
+          "Unable to connect to the server."
+        );
+      } finally {
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.textContent =
+            "Create Account";
+        }
       }
     }
-  });
+  );
 }
 
 // ===============================
@@ -330,67 +370,81 @@ if (registerForm) {
 const loginForm = $("#loginForm");
 
 if (loginForm) {
-  loginForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
+  loginForm.addEventListener(
+    "submit",
+    async (event) => {
+      event.preventDefault();
 
-    const email = $("#loginEmail")?.value.trim();
-    const password = $("#loginPassword")?.value;
+      const email = $("#loginEmail")?.value.trim();
+      const password = $("#loginPassword")?.value;
 
-    if (!email || !password) {
-      toast("Enter your email and password.");
-      return;
-    }
-
-    const submitButton = loginForm.querySelector(
-      'button[type="submit"]'
-    );
-
-    if (submitButton) {
-      submitButton.disabled = true;
-      submitButton.textContent = "Logging in...";
-    }
-
-    try {
-      const response = await fetch(
-        `${API_BASE}/api/auth/login`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email,
-            password,
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        toast(data.message || "Login failed.");
+      if (!email || !password) {
+        toast(
+          "Enter your email and password."
+        );
         return;
       }
 
-      saveAuth(data.token, data.user);
-      updateAuthUI();
+      const submitButton =
+        loginForm.querySelector(
+          'button[type="submit"]'
+        );
 
-      loginForm.reset();
-
-      authModal?.classList.remove("show");
-
-      toast("Login successful.");
-    } catch (error) {
-      console.error(error);
-      toast("Unable to connect to the server.");
-    } finally {
       if (submitButton) {
-        submitButton.disabled = false;
-        submitButton.textContent = "Login";
+        submitButton.disabled = true;
+        submitButton.textContent = "Logging in...";
+      }
+
+      try {
+        const response = await fetch(
+          `${API_BASE}/api/auth/login`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email,
+              password,
+            }),
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          toast(
+            data.message || "Login failed."
+          );
+          return;
+        }
+
+        saveAuth(data.token, data.user);
+
+        updateAuthUI();
+        await loadAccountDashboard();
+        await loadMyRequests();
+
+        loginForm.reset();
+
+        authModal?.classList.remove("show");
+
+        toast("Login successful.");
+      } catch (error) {
+        console.error(error);
+        toast(
+          "Unable to connect to the server."
+        );
+      } finally {
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.textContent = "Login";
+        }
       }
     }
-  });
+  );
 }
+
 // ===============================
 // MY REQUESTS
 // ===============================
@@ -409,6 +463,7 @@ async function loadMyRequests() {
         <p>Please log in to view your service requests.</p>
       </div>
     `;
+
     return;
   }
 
@@ -431,16 +486,21 @@ async function loadMyRequests() {
           <p>${data.message || "Please try again."}</p>
         </div>
       `;
+
       return;
     }
 
-    if (!data.requests || data.requests.length === 0) {
+    if (
+      !data.requests ||
+      data.requests.length === 0
+    ) {
       requestsList.innerHTML = `
         <div class="empty-state">
           <h3>No requests yet</h3>
           <p>Your service requests will appear here.</p>
         </div>
       `;
+
       return;
     }
 
@@ -469,7 +529,10 @@ async function loadMyRequests() {
       })
       .join("");
   } catch (error) {
-    console.error("My requests error:", error);
+    console.error(
+      "My requests error:",
+      error
+    );
 
     requestsList.innerHTML = `
       <div class="empty-state">
@@ -480,32 +543,36 @@ async function loadMyRequests() {
   }
 }
 
-loadMyRequests();
 // ===============================
 // SERVICE REQUEST BUTTONS
 // ===============================
 
-document.querySelectorAll(".service-card").forEach((card) => {
-  const button = card.querySelector("button");
+document
+  .querySelectorAll(".service-card")
+  .forEach((card) => {
+    const button = card.querySelector("button");
 
-  if (!button) return;
+    if (!button) return;
 
-  button.addEventListener("click", () => {
-    const service = card.dataset.service || "";
+    button.addEventListener("click", () => {
+      const service =
+        card.dataset.service || "";
 
-    const contactModal = $("#contactModal");
+      const contactModal =
+        $("#contactModal");
 
-    if (contactModal) {
-      contactModal.classList.add("show");
-    }
+      if (contactModal) {
+        contactModal.classList.add("show");
+      }
 
-    const serviceSelect = $("#contactService");
+      const serviceSelect =
+        $("#contactService");
 
-    if (serviceSelect && service) {
-      serviceSelect.value = service;
-    }
+      if (serviceSelect && service) {
+        serviceSelect.value = service;
+      }
+    });
   });
-});
 
 // ===============================
 // CONTACT / SERVICE REQUEST FORM
@@ -514,129 +581,110 @@ document.querySelectorAll(".service-card").forEach((card) => {
 const contactForm = $("#contactForm");
 
 if (contactForm) {
-  contactForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
+  contactForm.addEventListener(
+    "submit",
+    async (event) => {
+      event.preventDefault();
 
-    const token = getToken();
+      const token = getToken();
 
-    if (!token) {
-      authModal?.classList.add("show");
-      toast("Please log in before submitting a service request.");
-      return;
-    }
+      if (!token) {
+        authModal?.classList.add("show");
 
-    const service = $("#contactService")?.value;
-    const message = $("#contactMessage")?.value.trim();
+        toast(
+          "Please log in before submitting a service request."
+        );
 
-    if (!service || !message) {
-      toast("Please select a service and enter your message.");
-      return;
-    }
-
-    const submitButton = $("#contactSubmit");
-
-    if (submitButton) {
-      submitButton.disabled = true;
-      submitButton.textContent = "Submitting...";
-    }
-
-    try {
-      const response = await fetch(
-        `${API_BASE}/api/requests`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            service,
-            message,
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        toast(data.message || "Unable to submit request.");
         return;
       }
 
-      toast("Service request submitted successfully.");
+      const service =
+        $("#contactService")?.value;
 
-      contactForm.reset();
+      const message =
+        $("#contactMessage")?.value.trim();
 
-      const modal = $("#contactModal");
+      if (!service || !message) {
+        toast(
+          "Please select a service and enter your message."
+        );
 
-      if (modal) {
-        modal.classList.remove("show");
-      }
-
-      loadMyRequests();
-    } catch (error) {
-      console.error("Service request error:", error);
-      toast("Unable to submit request. Please try again.");
-    } finally {
-      if (submitButton) {
-        submitButton.disabled = false;
-        submitButton.textContent = "Submit Request";
-      }
-    }
-  });
-}
-
-    const submitButton = $("#contactSubmit");
-
-    if (submitButton) {
-      submitButton.disabled = true;
-      submitButton.textContent = "Submitting...";
-    }
-
-    try {
-      const response = await fetch(
-        `${API_BASE}/api/contact`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name,
-            phone,
-            email,
-            service,
-            message,
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        toast(data.message || "Unable to submit request.");
         return;
       }
 
-      toast("Request submitted successfully.");
+      const submitButton =
+        $("#contactSubmit");
 
-      contactForm.reset();
-
-      const modal = $("#contactModal");
-
-      if (modal) {
-        modal.classList.remove("show");
-      }
-    } catch (error) {
-      console.error(error);
-      toast("Unable to submit request. Please try again.");
-    } finally {
       if (submitButton) {
-        submitButton.disabled = false;
-        submitButton.textContent = "Submit Request";
+        submitButton.disabled = true;
+        submitButton.textContent =
+          "Submitting...";
+      }
+
+      try {
+        const response = await fetch(
+          `${API_BASE}/api/requests`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json",
+
+              Authorization:
+                `Bearer ${token}`,
+            },
+
+            body: JSON.stringify({
+              service,
+              message,
+            }),
+          }
+        );
+
+        const data =
+          await response.json();
+
+        if (!response.ok) {
+          toast(
+            data.message ||
+              "Unable to submit request."
+          );
+
+          return;
+        }
+
+        toast(
+          "Service request submitted successfully."
+        );
+
+        contactForm.reset();
+
+        const modal =
+          $("#contactModal");
+
+        if (modal) {
+          modal.classList.remove("show");
+        }
+
+        await loadMyRequests();
+      } catch (error) {
+        console.error(
+          "Service request error:",
+          error
+        );
+
+        toast(
+          "Unable to submit request. Please try again."
+        );
+      } finally {
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.textContent =
+            "Submit Request";
+        }
       }
     }
-  });
+  );
 }
 
 // ===============================
@@ -646,20 +694,38 @@ if (contactForm) {
 const fundBtn = $("#fundBtn");
 
 if (fundBtn) {
-  fundBtn.addEventListener("click", () => {
-    const amount = Number($("#fundAmount")?.value);
+  fundBtn.addEventListener(
+    "click",
+    () => {
+      const amount = Number(
+        $("#fundAmount")?.value
+      );
 
-    if (!amount || amount < 100) {
-      toast("Enter an amount of at least ₦100.");
-      return;
-    }
+      if (!amount || amount < 100) {
+        toast(
+          "Enter an amount of at least ₦100."
+        );
 
-    toast("Payment gateway will be connected later.");
-
-    const fundModal = $("#fundModal");
-
-    if (fundModal) {
-      fundModal.classList.remove("show");
-    }
-  });
+        return;
       }
+
+      toast(
+        "Payment gateway will be connected later."
+      );
+
+      const fundModal =
+        $("#fundModal");
+
+      if (fundModal) {
+        fundModal.classList.remove("show");
+      }
+    }
+  );
+}
+
+// ===============================
+// INITIALIZE
+// ===============================
+
+loadAccountDashboard();
+loadMyRequests();
