@@ -974,7 +974,14 @@ app.use((req, res) => {
 // ===============================
 // START SERVER
 // ===============================
-
+if (pool) {
+  ensureWalletColumn().catch((error) => {
+    console.error(
+      "Wallet setup failed:",
+      error.message
+    );
+  });
+}
 app.listen(PORT, "0.0.0.0", () => {
   console.log(
     `IB System Consult API listening on port ${PORT}`
