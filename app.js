@@ -807,3 +807,6 @@ if (fundBtn) {
 
 loadAccountDashboard();
 loadMyRequests();
+if (getUser()?.role === "admin") {
+  loadAdminRequests();
+}
