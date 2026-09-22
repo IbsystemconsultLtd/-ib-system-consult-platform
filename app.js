@@ -508,10 +508,6 @@ document.querySelectorAll(".service-card").forEach((card) => {
 });
 
 // ===============================
-// CONTACT FORM
-// ===============================
-
-// ===============================
 // CONTACT / SERVICE REQUEST FORM
 // ===============================
 
