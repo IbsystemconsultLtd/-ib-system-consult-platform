@@ -36,7 +36,7 @@ if (process.env.DATABASE_URL) {
   });
 } else {
   console.log("DATABASE_URL not found. Server will run without database.");
-} .
+}
 
 // ===============================
 // DATABASE TABLES
