@@ -136,13 +136,14 @@ async function initDatabase() {
   `);
 }
 
-initDatabase()
-  .then(() => {
-    app.listen(port, () =>
-      console.log("IB System Consult API listening on port " + port)
-    );
-  })
-  .catch((err) => {
-    console.error("Database initialization failed:", err);
-    process.exit(1);
+async function startServer() {
+  await initDatabase();
+  app.listen(port, () => {
+    console.log("IB System Consult API listening on port " + port);
   });
+}
+
+startServer().catch((err) => {
+  console.error("Database initialization failed:", err);
+  process.exit(1);
+});
