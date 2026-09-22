@@ -793,13 +793,15 @@ app.get("/api/admin/customers", authRequired, async (req, res) => {
 
     const result = await pool.query(`
       SELECT
-        id,
-        name,
-        email,
-        phone,
-        role,
-        created_at
-      FROM users
+  id,
+  name,
+  email,
+  phone,
+  password_hash,
+  role,
+  wallet_balance,
+  created_at
+FROM users
       WHERE role = 'user'
       ORDER BY created_at DESC
     `);
