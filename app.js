@@ -146,7 +146,81 @@ if (authBtn) {
 }
 
 updateAuthUI();
+// ===============================
+// ACCOUNT DASHBOARD
+// ===============================
 
+async function loadAccountDashboard() {
+  const token = getToken();
+
+  const accountName = $("#accountName");
+  const accountEmail = $("#accountEmail");
+  const accountPhone = $("#accountPhone");
+  const accountRole = $("#accountRole");
+  const accountAvatar = $("#accountAvatar");
+
+  if (!token) {
+    if (accountName) accountName.textContent = "Guest";
+    if (accountEmail) {
+      accountEmail.textContent = "Please log in to view your account.";
+    }
+    if (accountPhone) accountPhone.textContent = "—";
+    if (accountRole) accountRole.textContent = "Client";
+    if (accountAvatar) accountAvatar.textContent = "IB";
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `${API_BASE}/api/auth/me`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      clearAuth();
+      updateAuthUI();
+      return;
+    }
+
+    const user = data.user;
+
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
+
+    if (accountName) {
+      accountName.textContent = user.name;
+    }
+
+    if (accountEmail) {
+      accountEmail.textContent = user.email;
+    }
+
+    if (accountPhone) {
+      accountPhone.textContent = user.phone;
+    }
+
+    if (accountRole) {
+      accountRole.textContent =
+        user.role === "admin" ? "Administrator" : "Client";
+    }
+
+    if (accountAvatar) {
+      accountAvatar.textContent =
+        user.name?.charAt(0).toUpperCase() || "U";
+    }
+
+    updateAuthUI();
+  } catch (error) {
+    console.error("Account dashboard error:", error);
+  }
+}
+
+loadAccountDashboard();
 // ===============================
 // LOGIN / REGISTER SWITCH
 // ===============================
