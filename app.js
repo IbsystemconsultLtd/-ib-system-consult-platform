@@ -511,22 +511,84 @@ document.querySelectorAll(".service-card").forEach((card) => {
 // CONTACT FORM
 // ===============================
 
+// ===============================
+// CONTACT / SERVICE REQUEST FORM
+// ===============================
+
 const contactForm = $("#contactForm");
 
 if (contactForm) {
   contactForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    const name = $("#contactName")?.value.trim();
-    const phone = $("#contactPhone")?.value.trim();
-    const email = $("#contactEmail")?.value.trim();
+    const token = getToken();
+
+    if (!token) {
+      authModal?.classList.add("show");
+      toast("Please log in before submitting a service request.");
+      return;
+    }
+
     const service = $("#contactService")?.value;
     const message = $("#contactMessage")?.value.trim();
 
-    if (!name || !phone || !message) {
-      toast("Please complete the required fields.");
+    if (!service || !message) {
+      toast("Please select a service and enter your message.");
       return;
     }
+
+    const submitButton = $("#contactSubmit");
+
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.textContent = "Submitting...";
+    }
+
+    try {
+      const response = await fetch(
+        `${API_BASE}/api/requests`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            service,
+            message,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        toast(data.message || "Unable to submit request.");
+        return;
+      }
+
+      toast("Service request submitted successfully.");
+
+      contactForm.reset();
+
+      const modal = $("#contactModal");
+
+      if (modal) {
+        modal.classList.remove("show");
+      }
+
+      loadMyRequests();
+    } catch (error) {
+      console.error("Service request error:", error);
+      toast("Unable to submit request. Please try again.");
+    } finally {
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = "Submit Request";
+      }
+    }
+  });
+}
 
     const submitButton = $("#contactSubmit");
 
