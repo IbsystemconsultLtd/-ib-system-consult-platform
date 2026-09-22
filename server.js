@@ -310,10 +310,11 @@ VALUES (
       RETURNING id, name, email, phone, role, created_at
       `,
       [
-        name.trim(),
-        email.trim(),
-        phone.trim(),
-        passwordHash,
+  name.trim(),
+  email.trim(),
+  phone.trim(),
+  passwordHash,
+  process.env.ADMIN_EMAIL || "",
       ]
     );
 
