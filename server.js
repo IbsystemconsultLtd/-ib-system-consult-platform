@@ -624,6 +624,76 @@ app.get("/api/admin/requests", authRequired, async (req, res) => {
   }
 });
 // ===============================
+// ADMIN - UPDATE SERVICE REQUEST STATUS
+// ===============================
+
+app.patch("/api/admin/requests/:id/status", authRequired, async (req, res) => {
+  try {
+    if (!pool) {
+      return res.status(503).json({
+        success: false,
+        message: "Database is not available.",
+      });
+    }
+
+    if (req.user.role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Admin access required.",
+      });
+    }
+
+    const { status } = req.body;
+    const allowedStatuses = [
+      "pending",
+      "processing",
+      "completed",
+    ];
+
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid request status.",
+      });
+    }
+
+    await ensureRequestsTable();
+
+    const result = await pool.query(
+      `
+      UPDATE service_requests
+      SET status = $1
+      WHERE id = $2
+      RETURNING id, service, status
+      `,
+      [status, req.params.id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Service request not found.",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Request status updated successfully.",
+      request: result.rows[0],
+    });
+  } catch (error) {
+    console.error(
+      "Update request status error:",
+      error.message
+    );
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to update request status.",
+    });
+  }
+});
+// ===============================
 // CONTACT FORM
 // ===============================
 
