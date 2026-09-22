@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const { Pool } = require("pg");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const app = express();
 
@@ -9,6 +11,7 @@ const app = express();
 // ===============================
 
 const PORT = process.env.PORT || 10000;
+const JWT_SECRET = process.env.JWT_SECRET;
 
 app.use(cors());
 app.use(express.json());
@@ -33,6 +36,70 @@ if (process.env.DATABASE_URL) {
   });
 } else {
   console.log("DATABASE_URL not found. Server will run without database.");
+}
+
+// ===============================
+// DATABASE TABLES
+// ===============================
+
+async function ensureUsersTable() {
+  if (!pool) return;
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS users (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(150) NOT NULL,
+      email VARCHAR(150) NOT NULL UNIQUE,
+      phone VARCHAR(50) NOT NULL UNIQUE,
+      password_hash TEXT NOT NULL,
+      role VARCHAR(20) NOT NULL DEFAULT 'user',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+}
+
+// ===============================
+// AUTHENTICATION HELPERS
+// ===============================
+
+function createToken(user) {
+  return jwt.sign(
+    {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+    },
+    JWT_SECRET,
+    {
+      expiresIn: "7d",
+    }
+  );
+}
+
+function authRequired(req, res, next) {
+  try {
+    const header = req.headers.authorization;
+
+    if (!header || !header.startsWith("Bearer ")) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required.",
+      });
+    }
+
+    const token = header.substring(7);
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+
+    req.user = decoded;
+
+    next();
+  } catch (error) {
+    return res.status(401).json({
+      success: false,
+      message: "Invalid or expired login session.",
+    });
+  }
 }
 
 // ===============================
@@ -152,6 +219,232 @@ app.get("/api/services", (req, res) => {
 });
 
 // ===============================
+// REGISTER
+// ===============================
+
+app.post("/api/auth/register", async (req, res) => {
+  try {
+    if (!pool) {
+      return res.status(503).json({
+        success: false,
+        message: "Database is not available.",
+      });
+    }
+
+    if (!JWT_SECRET) {
+      return res.status(500).json({
+        success: false,
+        message: "Authentication system is not configured.",
+      });
+    }
+
+    const { name, email, phone, password } = req.body;
+
+    if (!name || !email || !phone || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Name, email, phone number and password are required.",
+      });
+    }
+
+    if (password.length < 8) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 8 characters.",
+      });
+    }
+
+    await ensureUsersTable();
+
+    const existingUser = await pool.query(
+      `
+      SELECT id
+      FROM users
+      WHERE LOWER(email) = LOWER($1)
+         OR phone = $2
+      LIMIT 1
+      `,
+      [email.trim(), phone.trim()]
+    );
+
+    if (existingUser.rows.length > 0) {
+      return res.status(409).json({
+        success: false,
+        message: "An account with this email or phone number already exists.",
+      });
+    }
+
+    const passwordHash = await bcrypt.hash(password, 12);
+
+    const result = await pool.query(
+      `
+      INSERT INTO users
+      (name, email, phone, password_hash)
+      VALUES ($1, LOWER($2), $3, $4)
+      RETURNING id, name, email, phone, role, created_at
+      `,
+      [
+        name.trim(),
+        email.trim(),
+        phone.trim(),
+        passwordHash,
+      ]
+    );
+
+    const user = result.rows[0];
+
+    const token = createToken(user);
+
+    res.status(201).json({
+      success: true,
+      message: "Account created successfully.",
+      token,
+      user,
+    });
+  } catch (error) {
+    console.error("Registration error:", error.message);
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to create account.",
+    });
+  }
+});
+
+// ===============================
+// LOGIN
+// ===============================
+
+app.post("/api/auth/login", async (req, res) => {
+  try {
+    if (!pool) {
+      return res.status(503).json({
+        success: false,
+        message: "Database is not available.",
+      });
+    }
+
+    if (!JWT_SECRET) {
+      return res.status(500).json({
+        success: false,
+        message: "Authentication system is not configured.",
+      });
+    }
+
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Email and password are required.",
+      });
+    }
+
+    await ensureUsersTable();
+
+    const result = await pool.query(
+      `
+      SELECT
+        id,
+        name,
+        email,
+        phone,
+        password_hash,
+        role,
+        created_at
+      FROM users
+      WHERE LOWER(email) = LOWER($1)
+      LIMIT 1
+      `,
+      [email.trim()]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email or password.",
+      });
+    }
+
+    const user = result.rows[0];
+
+    const passwordMatch = await bcrypt.compare(
+      password,
+      user.password_hash
+    );
+
+    if (!passwordMatch) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email or password.",
+      });
+    }
+
+    delete user.password_hash;
+
+    const token = createToken(user);
+
+    res.json({
+      success: true,
+      message: "Login successful.",
+      token,
+      user,
+    });
+  } catch (error) {
+    console.error("Login error:", error.message);
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to log in.",
+    });
+  }
+});
+
+// ===============================
+// CURRENT USER
+// ===============================
+
+app.get("/api/auth/me", authRequired, async (req, res) => {
+  try {
+    if (!pool) {
+      return res.status(503).json({
+        success: false,
+        message: "Database is not available.",
+      });
+    }
+
+    const result = await pool.query(
+      `
+      SELECT id, name, email, phone, role, created_at
+      FROM users
+      WHERE id = $1
+      LIMIT 1
+      `,
+      [req.user.id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "User account not found.",
+      });
+    }
+
+    res.json({
+      success: true,
+      user: result.rows[0],
+    });
+  } catch (error) {
+    console.error("Profile error:", error.message);
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to load account.",
+    });
+  }
+});
+
+// ===============================
 // CONTACT FORM
 // ===============================
 
@@ -166,7 +459,6 @@ app.post("/api/contact", async (req, res) => {
       });
     }
 
-    // If database is available, save the message.
     if (pool) {
       await pool.query(
         `
@@ -188,7 +480,13 @@ app.post("/api/contact", async (req, res) => {
         (name, phone, email, service, message)
         VALUES ($1, $2, $3, $4, $5)
         `,
-        [name, phone, email || null, service || null, message]
+        [
+          name,
+          phone,
+          email || null,
+          service || null,
+          message,
+        ]
       );
     }
 
