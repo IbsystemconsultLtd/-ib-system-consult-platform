@@ -42,7 +42,24 @@ if (process.env.DATABASE_URL) {
 // DATABASE TABLES
 // ===============================
 
-async function ensureUsersTable() {
+async function ensureUsersTable() {// ===============================
+// SERVICE REQUESTS TABLE
+// ===============================
+
+async function ensureRequestsTable() {
+  if (!pool) return;
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS service_requests (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+      service VARCHAR(150) NOT NULL,
+      message TEXT NOT NULL,
+      status VARCHAR(30) NOT NULL DEFAULT 'pending',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+}
   if (!pool) return;
 
   await pool.query(`
@@ -443,7 +460,101 @@ app.get("/api/auth/me", authRequired, async (req, res) => {
     });
   }
 });
+// ===============================
+// CREATE SERVICE REQUEST
+// ===============================
 
+app.post("/api/requests", authRequired, async (req, res) => {
+  try {
+    if (!pool) {
+      return res.status(503).json({
+        success: false,
+        message: "Database is not available.",
+      });
+    }
+
+    const { service, message } = req.body;
+
+    if (!service || !message) {
+      return res.status(400).json({
+        success: false,
+        message: "Service and message are required.",
+      });
+    }
+
+    await ensureRequestsTable();
+
+    const result = await pool.query(
+      `
+      INSERT INTO service_requests
+      (user_id, service, message)
+      VALUES ($1, $2, $3)
+      RETURNING id, service, message, status, created_at
+      `,
+      [
+        req.user.id,
+        service.trim(),
+        message.trim(),
+      ]
+    );
+
+    res.status(201).json({
+      success: true,
+      message: "Service request submitted successfully.",
+      request: result.rows[0],
+    });
+  } catch (error) {
+    console.error("Create request error:", error.message);
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to submit service request.",
+    });
+  }
+});
+// ===============================
+// GET MY SERVICE REQUESTS
+// ===============================
+
+app.get("/api/requests", authRequired, async (req, res) => {
+  try {
+    if (!pool) {
+      return res.status(503).json({
+        success: false,
+        message: "Database is not available.",
+      });
+    }
+
+    await ensureRequestsTable();
+
+    const result = await pool.query(
+      `
+      SELECT
+        id,
+        service,
+        message,
+        status,
+        created_at
+      FROM service_requests
+      WHERE user_id = $1
+      ORDER BY created_at DESC
+      `,
+      [req.user.id]
+    );
+
+    res.json({
+      success: true,
+      requests: result.rows,
+    });
+  } catch (error) {
+    console.error("Get requests error:", error.message);
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to load your requests.",
+    });
+  }
+});
 // ===============================
 // CONTACT FORM
 // ===============================
