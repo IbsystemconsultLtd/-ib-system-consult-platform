@@ -92,7 +92,109 @@
       <footer>© 2026 IB System Consult Ltd. All rights reserved.</footer>
     </main>
   </div>
-<div class="modal" id="contactModal" aria-hidden="true">
+<div class="modal" id="authModal" aria-hidden="true">
+  <div class="modal-box">
+    <button class="close" data-close>×</button>
+
+    <div id="loginView">
+      <p class="eyebrow">CLIENT ACCOUNT</p>
+      <h2>Login</h2>
+
+      <form id="loginForm">
+        <label>
+          Email
+          <input
+            id="loginEmail"
+            type="email"
+            placeholder="Enter your email"
+            required
+          >
+        </label>
+
+        <label>
+          Password
+          <input
+            id="loginPassword"
+            type="password"
+            placeholder="Enter your password"
+            required
+          >
+        </label>
+
+        <button class="primary-btn full" type="submit">
+          Login
+        </button>
+      </form>
+
+      <p class="modal-note">
+        Don't have an account?
+        <button class="text-btn" id="showRegister" type="button">
+          Create account
+        </button>
+      </p>
+    </div>
+
+    <div id="registerView" style="display:none;">
+      <p class="eyebrow">NEW CLIENT</p>
+      <h2>Create account</h2>
+
+      <form id="registerForm">
+        <label>
+          Full Name
+          <input
+            id="registerName"
+            type="text"
+            placeholder="Enter your full name"
+            required
+          >
+        </label>
+
+        <label>
+          Email
+          <input
+            id="registerEmail"
+            type="email"
+            placeholder="Enter your email"
+            required
+          >
+        </label>
+
+        <label>
+          Phone Number
+          <input
+            id="registerPhone"
+            type="tel"
+            placeholder="Enter your phone number"
+            required
+          >
+        </label>
+
+        <label>
+          Password
+          <input
+            id="registerPassword"
+            type="password"
+            placeholder="At least 8 characters"
+            minlength="8"
+            required
+          >
+        </label>
+
+        <button class="primary-btn full" type="submit">
+          Create Account
+        </button>
+      </form>
+
+      <p class="modal-note">
+        Already have an account?
+        <button class="text-btn" id="showLogin" type="button">
+          Login
+        </button>
+      </p>
+    </div>
+  </div>
+</div>
+  <div class="modal" id="contactModal" aria-hidden="true">
   <div class="modal-box">
     <button class="close" data-close>×</button>
 
