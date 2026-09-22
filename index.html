@@ -341,7 +341,39 @@
       <p class="modal-note">Payment processing will be connected to your payment provider during backend setup.</p>
     </div>
   </div>
+<!-- Customer Profile Modal -->
+<div class="modal" id="customerProfileModal" aria-hidden="true">
+  <div class="modal-box">
+    <button class="close" id="closeCustomerProfile">×</button>
 
+    <p class="eyebrow">CUSTOMER PROFILE</p>
+    <h2 id="profileCustomerName">Customer</h2>
+
+    <div class="account-grid">
+      <div class="account-card">
+        <span class="muted">Email</span>
+        <strong id="profileCustomerEmail">—</strong>
+      </div>
+
+      <div class="account-card">
+        <span class="muted">Phone</span>
+        <strong id="profileCustomerPhone">—</strong>
+      </div>
+
+      <div class="account-card">
+        <span class="muted">Joined</span>
+        <strong id="profileCustomerJoined">—</strong>
+      </div>
+    </div>
+
+    <div style="margin-top: 24px;">
+      <p class="eyebrow">SERVICE REQUESTS</p>
+      <div id="profileCustomerRequests">
+        <p class="muted">No service requests yet.</p>
+      </div>
+    </div>
+  </div>
+</div>
   <div class="toast" id="toast"></div>
   <script src="app.js?v=2"></script>
 </body>
