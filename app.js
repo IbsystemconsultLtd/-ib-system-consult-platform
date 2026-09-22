@@ -820,6 +820,54 @@ if (fundBtn) {
 
 loadAccountDashboard();
 loadMyRequests();
+document.addEventListener("change", async (event) => {
+  if (!event.target.classList.contains("request-status-select")) {
+    return;
+  }
+
+  const requestId = event.target.dataset.requestId;
+  const status = event.target.value;
+  const token = getToken();
+
+  if (!token || !requestId) {
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `${API_BASE}/api/admin/requests/${requestId}/status`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      toast(
+        data.message || "Unable to update request status."
+      );
+      return;
+    }
+
+    toast("Request status updated successfully.");
+
+    await loadAdminRequests();
+
+  } catch (error) {
+    console.error(
+      "Update request status error:",
+      error
+    );
+
+    toast("Unable to update request status.");
+  }
+});
 if (getUser()?.role === "admin") {
   loadAdminRequests();
 }
