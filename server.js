@@ -1034,7 +1034,9 @@ app.post("/api/wallet/fund", authRequired, async (req, res) => {
     }
 
     const user = userResult.rows[0];
-
+console.log("PAYSTACK KEY EXISTS:", !!PAYSTACK_SECRET_KEY);
+console.log("PAYSTACK USER EMAIL:", user.email);
+console.log("PAYSTACK AMOUNT:", Math.round(amount * 100));
     const response = await fetch(
       "https://api.paystack.co/transaction/initialize",
       {
