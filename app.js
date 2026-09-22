@@ -863,12 +863,75 @@ ${message}`,
 // FUNDING BUTTON
 // ===============================
 
-const fundBtn = $("#fundBtn");
+const const fundBtn = $("#fundBtn");
 
 if (fundBtn) {
-  fundBtn.addEventListener(
-    "click",
-    () => {
+  fundBtn.addEventListener("click", async () => {
+    const amount = Number(
+      $("#fundAmount")?.value
+    );
+
+    if (!amount || amount < 100) {
+      toast("Enter an amount of at least ₦100.");
+      return;
+    }
+
+    const token = getToken();
+
+    if (!token) {
+      toast("Please log in first.");
+      return;
+    }
+
+    fundBtn.disabled = true;
+    fundBtn.textContent = "Starting payment...";
+
+    try {
+      const response = await fetch(
+        `${API_BASE}/api/wallet/fund`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            amount,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        toast(
+          data.message ||
+          "Unable to start payment."
+        );
+
+        return;
+      }
+
+      window.location.href =
+        data.authorization_url;
+
+    } catch (error) {
+      console.error(
+        "Payment initialization error:",
+        error
+      );
+
+      toast(
+        "Unable to connect to the payment server."
+      );
+
+    } finally {
+      fundBtn.disabled = false;
+      fundBtn.textContent =
+        "Continue to payment";
+    }
+  });
+}
       const amount = Number(
         $("#fundAmount")?.value
       );
