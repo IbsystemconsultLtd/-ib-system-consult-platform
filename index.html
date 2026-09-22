@@ -91,7 +91,53 @@
       <footer>© 2026 IB System Consult Ltd. All rights reserved.</footer>
     </main>
   </div>
+<div class="modal" id="contactModal" aria-hidden="true">
+  <div class="modal-box">
+    <button class="close" data-close>×</button>
 
+    <p class="eyebrow">SERVICE REQUEST</p>
+    <h2>Submit a Request</h2>
+
+    <form id="contactForm">
+      <label>
+        Full Name
+        <input id="contactName" type="text" placeholder="Enter your full name" required>
+      </label>
+
+      <label>
+        Phone Number
+        <input id="contactPhone" type="tel" placeholder="Enter your phone number" required>
+      </label>
+
+      <label>
+        Email
+        <input id="contactEmail" type="email" placeholder="Enter your email address">
+      </label>
+
+      <label>
+        Service
+        <select id="contactService" required>
+          <option value="">Select a service</option>
+          <option value="NIN Services">NIN Services</option>
+          <option value="Education Services">Education Services</option>
+          <option value="Telecom Services">Telecom Services</option>
+          <option value="BVN Services">BVN Services</option>
+          <option value="Result Checking">Result Checking</option>
+          <option value="Customer Support">Customer Support</option>
+        </select>
+      </label>
+
+      <label>
+        Message
+        <textarea id="contactMessage" rows="4" placeholder="Tell us what you need..." required></textarea>
+      </label>
+
+      <button class="primary-btn full" id="contactSubmit" type="submit">
+        Submit Request
+      </button>
+    </form>
+  </div>
+</div>
   <div class="modal" id="fundModal" aria-hidden="true">
     <div class="modal-box">
       <button class="close" data-close>×</button>
