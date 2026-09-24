@@ -13,6 +13,7 @@ const app = express();
 
 const PORT = process.env.PORT || 10000;
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
+const FLW_SECRET_KEY = process.env.FLW_SECRET_KEY;
 const JWT_SECRET = process.env.JWT_SECRET;
 
 app.use(cors());
