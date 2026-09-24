@@ -1442,32 +1442,36 @@ app.get("/api/flutterwave/verify/:transactionId", authRequired, async (req, res)
       });
     }
 
-    await pool.query("BEGIN");
+    const client = await pool.connect();
 
-    try {
-      await pool.query(
-        `
-        UPDATE users
-        SET wallet_balance = wallet_balance + $1
-        WHERE id = $2
-        `,
-        [amount, userId]
-      );
+try {
+  await client.query("BEGIN");
 
-      await pool.query(
-        `
-        INSERT INTO wallet_transactions
-        (user_id, reference, amount, type, status)
-        VALUES ($1, $2, $3, 'credit', 'successful')
-        `,
-        [userId, txRef, amount]
-      );
+  await client.query(
+    `
+    UPDATE users
+    SET wallet_balance = wallet_balance + $1
+    WHERE id = $2
+    `,
+    [amount, userId]
+  );
 
-      await pool.query("COMMIT");
-    } catch (error) {
-      await pool.query("ROLLBACK");
-      throw error;
-    }
+  await client.query(
+    `
+    INSERT INTO wallet_transactions
+    (user_id, reference, amount, type, status)
+    VALUES ($1, $2, $3, 'credit', 'successful')
+    `,
+    [userId, txRef, amount]
+  );
+
+  await client.query("COMMIT");
+} catch (error) {
+  await client.query("ROLLBACK");
+  throw error;
+} finally {
+  client.release();
+}
 
     res.json({
       success: true,
