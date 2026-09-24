@@ -196,7 +196,10 @@ const accountWallet = $("#accountWallet");
     }
 
     const user = data.user;
-
+if (accountWallet) {
+  accountWallet.textContent =
+    `₦${Number(user.wallet_balance || 0).toLocaleString()}`;
+      }
     localStorage.setItem(
       USER_KEY,
       JSON.stringify(user)
