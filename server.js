@@ -1348,11 +1348,10 @@ app.post("/api/flutterwave/fund", authRequired, async (req, res) => {
       tx_ref: data.data.tx_ref,
     });
 
-  } catch (error) {
-    console.error(
-      "Flutterwave funding error:",
-      error.message
-    );
+  console.error(
+  "Flutterwave funding error:",
+  error
+);
 
     res.status(500).json({
       success: false,
