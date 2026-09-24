@@ -1208,7 +1208,7 @@ async function loadAdminCustomers() {
 
   const status = params.get("status");
   const transactionId = params.get("transaction_id");
-  
+  const payment = params.get("payment");
   if (status !== "successful" || !transactionId) {
     return;
   }
