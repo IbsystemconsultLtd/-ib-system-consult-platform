@@ -1196,3 +1196,62 @@ async function loadAdminCustomers() {
     `;
   }
         }
+// ===============================
+// FLUTTERWAVE PAYMENT RETURN
+// ===============================
+
+(async function handleFlutterwaveReturn() {
+  const params = new URLSearchParams(window.location.search);
+
+  const status = params.get("status");
+  const transactionId = params.get("transaction_id");
+
+  if (status !== "successful" || !transactionId) {
+    return;
+  }
+
+  const token = getToken();
+
+  if (!token) {
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `${API_BASE}/api/flutterwave/verify/${transactionId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const data = await response.json();
+
+    if (response.ok && data.success) {
+      toast(
+        `Wallet funded successfully: ₦${Number(data.amount).toLocaleString()}`
+      );
+
+      await loadAccountDashboard();
+    } else {
+      toast(
+        data.message || "Payment verification failed."
+      );
+    }
+
+  } catch (error) {
+    console.error(
+      "Flutterwave return verification error:",
+      error
+    );
+
+    toast("Unable to verify your payment.");
+  }
+
+  window.history.replaceState(
+    {},
+    document.title,
+    window.location.pathname
+  );
+})();
