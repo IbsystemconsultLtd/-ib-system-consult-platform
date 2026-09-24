@@ -1211,6 +1211,15 @@ async function loadAdminCustomers() {
   const payment = params.get("payment");
   if (payment === "success") {
   await loadAccountDashboard();
+  window.history.replaceState(
+    {},
+    document.title,
+    window.location.pathname
+  );
+  return;
+  }
+  if (payment === "success") {
+  await loadAccountDashboard();
   window.history.replaceState({}, document.title, window.location.pathname);
   return;
 }
