@@ -888,7 +888,7 @@ if (fundBtn) {
 
     try {
       const response = await fetch(
-        `${API_BASE}/api/wallet/fund`,
+        `${API_BASE}/api/flutterwave/fund`,
         {
           method: "POST",
           headers: {
@@ -912,11 +912,11 @@ if (fundBtn) {
       }
 
       window.location.href =
-        data.authorization_url;
+        data.payment_link;
 
     } catch (error) {
       console.error(
-        "Payment initialization error:",
+        "Flutterwave payment error:",
         error
       );
 
