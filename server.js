@@ -1244,6 +1244,120 @@ app.get("/api/wallet/verify/:reference", authRequired, async (req, res) => {
     });
   }
 });
+// ===============================
+// FLUTTERWAVE: INITIALIZE PAYMENT
+// ===============================
+
+app.post("/api/flutterwave/fund", authRequired, async (req, res) => {
+  try {
+    if (!pool) {
+      return res.status(503).json({
+        success: false,
+        message: "Database is not available.",
+      });
+    }
+
+    if (!FLW_SECRET_KEY) {
+      return res.status(500).json({
+        success: false,
+        message: "Flutterwave is not configured.",
+      });
+    }
+
+    const amount = Number(req.body.amount);
+
+    if (!Number.isFinite(amount) || amount < 100) {
+      return res.status(400).json({
+        success: false,
+        message: "Minimum wallet funding is ₦100.",
+      });
+    }
+
+    await ensureWalletColumn();
+
+    const userResult = await pool.query(
+      `
+      SELECT id, name, email, phone
+      FROM users
+      WHERE id = $1
+      `,
+      [req.user.id]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "User account not found.",
+      });
+    }
+
+    const user = userResult.rows[0];
+
+    const response = await fetch(
+      "https://api.flutterwave.com/v3/payments",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${FLW_SECRET_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          tx_ref: `IB-${user.id}-${Date.now()}`,
+          amount: amount,
+          currency: "NGN",
+          redirect_url:
+            "https://ibsystemconsultltd.github.io/-ib-system-consult-platform/",
+          customer: {
+            email: user.email,
+            name: user.name,
+            phonenumber: user.phone,
+          },
+          customizations: {
+            title: "IB SYSTEM CONSULT LTD",
+            description: "Wallet Funding",
+          },
+          meta: {
+            user_id: user.id,
+            purpose: "wallet_funding",
+          },
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || data.status !== "success") {
+      console.error(
+        "Flutterwave initialization failed:",
+        data
+      );
+
+      return res.status(502).json({
+        success: false,
+        message:
+          data.message ||
+          "Unable to initialize Flutterwave payment.",
+      });
+    }
+
+    res.json({
+      success: true,
+      payment_link: data.data.link,
+      tx_ref: data.data.tx_ref,
+    });
+
+  } catch (error) {
+    console.error(
+      "Flutterwave funding error:",
+      error.message
+    );
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to start payment.",
+    });
+  }
+});
 app.listen(PORT, "0.0.0.0", () => {
   console.log(
     `IB System Consult API listening on port ${PORT}`
