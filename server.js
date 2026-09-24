@@ -1296,7 +1296,7 @@ const txRef = `IB-${user.id}-${Date.now()}`;
           amount: amount,
           currency: "NGN",
           redirect_url:
-            "https://ibsystemconsultltd.github.io/-ib-system-consult-platform/",
+  "https://ib-system-consult-platform.onrender.com/api/flutterwave/callback",
           customer: {
             email: user.email,
             name: user.name,
