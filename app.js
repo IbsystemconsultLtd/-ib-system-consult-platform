@@ -904,11 +904,15 @@ if (fundBtn) {
       const data = await response.json();
 
       if (!response.ok || !data.success) {
-        toast(
-          data.message ||
-          "Unable to start payment."
-        );
-        return;
+  console.log("Flutterwave backend response:", data);
+
+  toast(
+    data.message ||
+    JSON.stringify(data) ||
+    "Unable to start payment."
+  );
+
+  return;
       }
 
       window.location.href =
