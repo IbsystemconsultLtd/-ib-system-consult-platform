@@ -1215,8 +1215,6 @@ async function loadAdminCustomers() {
   return;
 }
 
-if (status !== "successful" || !transactionId) {
-  }
 
   const token = getToken();
 
