@@ -1209,8 +1209,13 @@ async function loadAdminCustomers() {
   const status = params.get("status");
   const transactionId = params.get("transaction_id");
   const payment = params.get("payment");
-  if (status !== "successful" || !transactionId) {
-    return;
+  if (payment === "success") {
+  await loadAccountDashboard();
+  window.history.replaceState({}, document.title, window.location.pathname);
+  return;
+}
+
+if (status !== "successful" || !transactionId) {
   }
 
   const token = getToken();
