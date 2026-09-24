@@ -161,7 +161,7 @@ async function loadAccountDashboard() {
   const accountPhone = $("#accountPhone");
   const accountRole = $("#accountRole");
   const accountAvatar = $("#accountAvatar");
-
+const accountWallet = $("#accountWallet");
   if (!token) {
     if (accountName) accountName.textContent = "Guest";
 
