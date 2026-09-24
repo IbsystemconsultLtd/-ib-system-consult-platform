@@ -1207,6 +1207,7 @@ async function loadAdminCustomers() {
   const transactionId =
   params.get("transaction_id") ||
   params.get("tx_ref");
+  alert(
   `Flutterwave return:\nStatus: ${status}\nTransaction ID: ${transactionId}`
 );
   if (status !== "successful" || !transactionId) {
