@@ -1337,6 +1337,18 @@ const txRef = `IB-${user.id}-${Date.now()}`;
       payment_link: data.data.link,
       tx_ref: data.data.tx_ref,
     });
+    } catch (error) {
+  console.error(
+  "Flutterwave funding error:",
+  error
+);
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to start payment.",
+    });
+  }
+});
 // ===============================
 // FLUTTERWAVE: VERIFY PAYMENT
 // ===============================
@@ -1488,18 +1500,7 @@ try {
     });
   }
 });
-    } catch (error) {
-  console.error(
-  "Flutterwave funding error:",
-  error
-);
-
-    res.status(500).json({
-      success: false,
-      message: "Unable to start payment.",
-    });
-  }
-});
+    
 app.use((req, res) => {
   res.status(404).json({
     success: false,
