@@ -1204,8 +1204,9 @@ async function loadAdminCustomers() {
   const params = new URLSearchParams(window.location.search);
 
   const status = params.get("status");
-  const transactionId = params.get("transaction_id");
-alert(
+  const transactionId =
+  params.get("transaction_id") ||
+  params.get("tx_ref");
   `Flutterwave return:\nStatus: ${status}\nTransaction ID: ${transactionId}`
 );
   if (status !== "successful" || !transactionId) {
