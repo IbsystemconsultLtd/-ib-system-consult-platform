@@ -965,16 +965,6 @@ app.post("/api/contact", async (req, res) => {
   }
 });
 
-// ===============================
-// 404 ROUTE
-// ===============================
-
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    error: "Endpoint not found.",
-  });
-});
 
 // ===============================
 // START SERVER
