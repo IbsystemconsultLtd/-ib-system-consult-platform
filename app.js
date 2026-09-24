@@ -200,6 +200,12 @@ if (accountWallet) {
   accountWallet.textContent =
     `₦${Number(user.wallet_balance || 0).toLocaleString()}`;
       }
+    const overviewWallet = $("#overviewWallet");
+
+if (overviewWallet) {
+  overviewWallet.textContent =
+    `₦${Number(user.wallet_balance || 0).toLocaleString()}`;
+}
     localStorage.setItem(
       USER_KEY,
       JSON.stringify(user)
