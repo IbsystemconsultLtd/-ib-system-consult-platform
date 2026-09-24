@@ -1507,6 +1507,122 @@ app.use((req, res) => {
     error: "Endpoint not found.",
   });
 });
+app.get("/api/flutterwave/callback", async (req, res) => {
+  try {
+    const { transaction_id } = req.query;
+
+    if (!transaction_id) {
+      return res.redirect(
+        "https://ibsystemconsultltd.github.io/-ib-system-consult-platform/?payment=failed"
+      );
+    }
+
+    const response = await fetch(
+      `https://api.flutterwave.com/v3/transactions/${transaction_id}/verify`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${FLW_SECRET_KEY}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    const data = await response.json();
+
+    if (
+      !response.ok ||
+      data.status !== "success" ||
+      data.data?.status !== "successful" ||
+      data.data?.currency !== "NGN"
+    ) {
+      return res.redirect(
+        "https://ibsystemconsultltd.github.io/-ib-system-consult-platform/?payment=failed"
+      );
+    }
+
+    const payment = data.data;
+    const txRef = payment.tx_ref;
+    const amount = Number(payment.amount);
+
+    const match = String(txRef || "").match(/^IB-(\d+)-/);
+
+    if (!match || !pool) {
+      return res.redirect(
+        "https://ibsystemconsultltd.github.io/-ib-system-consult-platform/?payment=failed"
+      );
+    }
+
+    const userId = Number(match[1]);
+
+    await ensureWalletColumn();
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS wallet_transactions (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL,
+        reference TEXT UNIQUE NOT NULL,
+        amount NUMERIC(12,2) NOT NULL,
+        type TEXT NOT NULL DEFAULT 'credit',
+        status TEXT NOT NULL DEFAULT 'successful',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    const existing = await pool.query(
+      `
+      SELECT id
+      FROM wallet_transactions
+      WHERE reference = $1
+      `,
+      [txRef]
+    );
+
+    if (existing.rows.length === 0) {
+      const client = await pool.connect();
+
+      try {
+        await client.query("BEGIN");
+
+        await client.query(
+          `
+          UPDATE users
+          SET wallet_balance = wallet_balance + $1
+          WHERE id = $2
+          `,
+          [amount, userId]
+        );
+
+        await client.query(
+          `
+          INSERT INTO wallet_transactions
+          (user_id, reference, amount, type, status)
+          VALUES ($1, $2, $3, 'credit', 'successful')
+          `,
+          [userId, txRef, amount]
+        );
+
+        await client.query("COMMIT");
+      } catch (error) {
+        await client.query("ROLLBACK");
+        throw error;
+      } finally {
+        client.release();
+      }
+    }
+
+    return res.redirect(
+      "https://ibsystemconsultltd.github.io/-ib-system-consult-platform/?payment=success"
+    );
+
+  } catch (error) {
+    console.error("Flutterwave callback error:", error);
+
+    return res.redirect(
+      "https://ibsystemconsultltd.github.io/-ib-system-consult-platform/?payment=failed"
+    );
+  }
+});
 app.listen(PORT, "0.0.0.0", () => {
   console.log(
     `IB System Consult API listening on port ${PORT}`
