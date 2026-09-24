@@ -1501,12 +1501,6 @@ try {
   }
 });
     
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    error: "Endpoint not found.",
-  });
-});
 app.get("/api/flutterwave/callback", async (req, res) => {
   try {
     const { transaction_id } = req.query;
@@ -1622,6 +1616,12 @@ app.get("/api/flutterwave/callback", async (req, res) => {
       "https://ibsystemconsultltd.github.io/-ib-system-consult-platform/?payment=failed"
     );
   }
+});
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    error: "Endpoint not found.",
+  });
 });
 app.listen(PORT, "0.0.0.0", () => {
   console.log(
