@@ -1360,6 +1360,12 @@ app.post("/api/flutterwave/fund", authRequired, async (req, res) => {
     });
   }
 });
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    error: "Endpoint not found.",
+  });
+});
 app.listen(PORT, "0.0.0.0", () => {
   console.log(
     `IB System Consult API listening on port ${PORT}`
