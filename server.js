@@ -1327,17 +1327,19 @@ app.post("/api/flutterwave/fund", authRequired, async (req, res) => {
     const data = await response.json();
 
     if (!response.ok || data.status !== "success") {
-      console.error(
-        "Flutterwave initialization failed:",
-        data
-      );
+  console.error(
+    "Flutterwave initialization failed:",
+    data
+  );
 
-      return res.status(502).json({
-        success: false,
-        message:
-          data.message ||
-          "Unable to initialize Flutterwave payment.",
-      });
+  return res.status(502).json({
+    success: false,
+    message:
+      data.message ||
+      data.data?.message ||
+      "Unable to initialize Flutterwave payment.",
+    debug: data,
+  });
     }
 
     res.json({
