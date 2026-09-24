@@ -1282,7 +1282,7 @@ app.post("/api/flutterwave/fund", authRequired, async (req, res) => {
     }
 
     const user = userResult.rows[0];
-
+const txRef = `IB-${user.id}-${Date.now()}`;
     const response = await fetch(
       "https://api.flutterwave.com/v3/payments",
       {
@@ -1292,7 +1292,7 @@ app.post("/api/flutterwave/fund", authRequired, async (req, res) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          tx_ref: `IB-${user.id}-${Date.now()}`,
+          tx_ref: txRef,
           amount: amount,
           currency: "NGN",
           redirect_url:
