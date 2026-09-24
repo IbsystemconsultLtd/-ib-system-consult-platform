@@ -1337,7 +1337,153 @@ app.post("/api/flutterwave/fund", authRequired, async (req, res) => {
       payment_link: data.data.link,
       tx_ref: data.data.tx_ref,
     });
+// ===============================
+// FLUTTERWAVE: VERIFY PAYMENT
+// ===============================
 
+app.get("/api/flutterwave/verify/:transactionId", authRequired, async (req, res) => {
+  try {
+    if (!pool) {
+      return res.status(503).json({
+        success: false,
+        message: "Database is not available.",
+      });
+    }
+
+    if (!FLW_SECRET_KEY) {
+      return res.status(500).json({
+        success: false,
+        message: "Flutterwave is not configured.",
+      });
+    }
+
+    const transactionId = req.params.transactionId;
+
+    const response = await fetch(
+      `https://api.flutterwave.com/v3/transactions/${transactionId}/verify`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${FLW_SECRET_KEY}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || data.status !== "success") {
+      return res.status(400).json({
+        success: false,
+        message: data.message || "Unable to verify payment.",
+      });
+    }
+
+    const payment = data.data;
+
+    if (
+      payment.status !== "successful" ||
+      payment.currency !== "NGN"
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Payment was not successful.",
+      });
+    }
+
+    const amount = Number(payment.amount);
+    const txRef = payment.tx_ref;
+
+    const match = String(txRef || "").match(/^IB-(\d+)-/);
+
+    if (!match) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid payment reference.",
+      });
+    }
+
+    const userId = Number(match[1]);
+
+    if (userId !== Number(req.user.id)) {
+      return res.status(403).json({
+        success: false,
+        message: "Payment does not belong to this account.",
+      });
+    }
+
+    await ensureWalletColumn();
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS wallet_transactions (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL,
+        reference TEXT UNIQUE NOT NULL,
+        amount NUMERIC(12,2) NOT NULL,
+        type TEXT NOT NULL DEFAULT 'credit',
+        status TEXT NOT NULL DEFAULT 'successful',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    const existing = await pool.query(
+      `
+      SELECT id
+      FROM wallet_transactions
+      WHERE reference = $1
+      `,
+      [txRef]
+    );
+
+    if (existing.rows.length > 0) {
+      return res.json({
+        success: true,
+        message: "Payment already credited.",
+      });
+    }
+
+    await pool.query("BEGIN");
+
+    try {
+      await pool.query(
+        `
+        UPDATE users
+        SET wallet_balance = wallet_balance + $1
+        WHERE id = $2
+        `,
+        [amount, userId]
+      );
+
+      await pool.query(
+        `
+        INSERT INTO wallet_transactions
+        (user_id, reference, amount, type, status)
+        VALUES ($1, $2, $3, 'credit', 'successful')
+        `,
+        [userId, txRef, amount]
+      );
+
+      await pool.query("COMMIT");
+    } catch (error) {
+      await pool.query("ROLLBACK");
+      throw error;
+    }
+
+    res.json({
+      success: true,
+      message: "Wallet funded successfully.",
+      amount: amount,
+    });
+
+  } catch (error) {
+    console.error("Flutterwave verification error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to verify payment.",
+    });
+  }
+});
     } catch (error) {
   console.error(
   "Flutterwave funding error:",
