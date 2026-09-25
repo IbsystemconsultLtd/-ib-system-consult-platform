@@ -457,100 +457,88 @@ if (loginForm) {
 // ===============================
 // MY REQUESTS
 // ===============================
-
 async function loadMyRequests() {
   const requestsList = $("#requestsList");
+  const requestsEmpty = $("#requestsEmpty");
 
   if (!requestsList) return;
 
   const token = getToken();
 
   if (!token) {
+    if (requestsEmpty) requestsEmpty.style.display = "block";
+
     requestsList.innerHTML = `
       <div class="empty-state">
         <h3>Login required</h3>
         <p>Please log in to view your service requests.</p>
       </div>
     `;
-
     return;
   }
 
   try {
-    const response = await fetch(
-      `${API_BASE}/api/requests`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+    const response = await fetch(`${API_BASE}/api/requests`, {
+      headers: {
+        Authorization: `Bearer ${token}`
       }
-    );
+    });
 
     const data = await response.json();
 
     if (!response.ok) {
+      if (requestsEmpty) requestsEmpty.style.display = "none";
+
       requestsList.innerHTML = `
         <div class="empty-state">
           <h3>Unable to load requests</h3>
-          <p>${data.message || "Please try again."}</p>
+          <p>${data.error || "Please try again."}</p>
         </div>
       `;
-
       return;
     }
 
-    if (
-      !data.requests ||
-      data.requests.length === 0
-    ) {
-      requestsList.innerHTML = `
-        <div class="empty-state">
-          <h3>No requests yet</h3>
-          <p>Your service requests will appear here.</p>
-        </div>
-      `;
+    if (!data.requests || data.requests.length === 0) {
+      if (requestsEmpty) requestsEmpty.style.display = "block";
 
+      requestsList.innerHTML = "";
       return;
     }
 
-    requestsList.innerHTML = data.requests
-      .map((request) => {
-        const date = new Date(
-          request.created_at
-        ).toLocaleString();
+    // Requests exist — hide the empty message
+    if (requestsEmpty) requestsEmpty.style.display = "none";
 
-        return `
-          <div class="request-card">
-            <div>
-              <span class="muted">Service</span>
-              <h3>${request.service}</h3>
-            </div>
+    requestsList.innerHTML = data.requests.map(request => {
+      const date = new Date(request.created_at).toLocaleString();
 
-            <span class="request-status">
-              ${request.status}
-            </span>
-
-            <p>${request.message}</p>
-
-            <small>${date}</small>
+      return `
+        <div class="request-card">
+          <div>
+            <span class="muted">Service</span>
+            <h3>${request.service}</h3>
           </div>
-        `;
-      })
-      .join("");
+
+          <span class="request-status">${request.status}</span>
+
+          <p>${request.message}</p>
+
+          <small>${date}</small>
+        </div>
+      `;
+    }).join("");
+
   } catch (error) {
-    console.error(
-      "My requests error:",
-      error
-    );
+    if (requestsEmpty) requestsEmpty.style.display = "none";
 
     requestsList.innerHTML = `
       <div class="empty-state">
-        <h3>Connection error</h3>
-        <p>Unable to connect to the server.</p>
+        <h3>Unable to load requests</h3>
+        <p>Please check your connection and try again.</p>
       </div>
     `;
   }
 }
+
 // ===============================
 // ADMIN DASHBOARD
 // ===============================
