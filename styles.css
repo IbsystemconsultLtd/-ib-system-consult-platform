@@ -798,3 +798,75 @@ nav{display:grid;gap:7px}.nav-link{padding:13px 14px;border-radius:10px;color:#5
     border-radius:17px;
   }
 }
+/* =========================
+   TRANSACTIONS & SUPPORT
+   ========================= */
+
+.transaction-empty{
+  margin-top:4px;
+}
+
+#transactions .empty-card{
+  min-height:170px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+
+.support{
+  margin-top:32px;
+  padding:32px;
+  border-radius:22px;
+  background:linear-gradient(135deg,#081b33,#0d2f5f,#155eef);
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:24px;
+  box-shadow:0 18px 45px rgba(13,36,66,.14);
+}
+
+.support-content{
+  max-width:650px;
+}
+
+.support .eyebrow{
+  color:#cbdcff;
+}
+
+.support h2{
+  margin:8px 0 8px;
+  font-size:28px;
+  color:#fff;
+}
+
+.support p{
+  margin:0;
+  color:#dbe8ff;
+  line-height:1.6;
+  font-size:14px;
+}
+
+.support .primary-btn{
+  flex-shrink:0;
+  background:#fff;
+  color:var(--brand);
+}
+
+@media(max-width:700px){
+  .support{
+    padding:25px 20px;
+    flex-direction:column;
+    align-items:stretch;
+    border-radius:19px;
+  }
+
+  .support h2{
+    font-size:24px;
+  }
+
+  .support .primary-btn{
+    width:100%;
+  }
+}
