@@ -195,15 +195,17 @@
   <div class="section-head">
     <div>
       <p class="eyebrow">MY ACCOUNT</p>
-      <h2>Account overview</h2>
+      <h2>Your account</h2>
+      <p class="muted">Manage your profile and keep track of your IB System Consult account.</p>
     </div>
   </div>
 
   <div class="account-grid">
-    <div class="account-card">
+
+    <div class="account-card account-profile">
       <div class="account-avatar" id="accountAvatar">IB</div>
 
-      <div>
+      <div class="account-profile-info">
         <span class="muted">Welcome back</span>
         <h3 id="accountName">Guest</h3>
         <p id="accountEmail">Please log in to view your account.</p>
@@ -211,19 +213,21 @@
     </div>
 
     <div class="account-card">
-      <span class="muted">Phone number</span>
+      <span class="account-label">PHONE NUMBER</span>
       <strong id="accountPhone">—</strong>
     </div>
 
     <div class="account-card">
-      <span class="muted">Account type</span>
+      <span class="account-label">ACCOUNT TYPE</span>
       <strong id="accountRole">Client</strong>
     </div>
 
-    <div class="account-card">
-      <span class="muted">Wallet balance</span>
+    <div class="account-card account-wallet-card">
+      <span class="account-label">WALLET BALANCE</span>
       <strong id="accountBalance">₦<span id="accountWallet">₦0.00</span></strong>
+      <button class="outline-btn" data-modal="fundModal">Fund wallet →</button>
     </div>
+
   </div>
 </section>
       <section id="requests" class="section">
