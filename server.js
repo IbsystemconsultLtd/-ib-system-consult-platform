@@ -963,6 +963,123 @@ app.get("/api/transactions", authRequired, async (req, res) => {
   }
 });
 // ===============================
+// PAY FOR SERVICE USING WALLET
+// ===============================
+
+app.post("/api/pay-service", authRequired, async (req, res) => {
+  try {
+    const { service, amount, message } = req.body;
+
+    const price = Number(amount);
+
+    if (!service || !price || price <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Valid service and amount are required."
+      });
+    }
+
+    if (!pool) {
+      return res.status(503).json({
+        success: false,
+        message: "Database is not available."
+      });
+    }
+
+    await pool.query("BEGIN");
+
+    const userResult = await pool.query(
+      `
+      SELECT id, wallet_balance
+      FROM users
+      WHERE id = $1
+      FOR UPDATE
+      `,
+      [req.user.id]
+    );
+
+    if (userResult.rows.length === 0) {
+      await pool.query("ROLLBACK");
+
+      return res.status(404).json({
+        success: false,
+        message: "User account not found."
+      });
+    }
+
+    const walletBalance = Number(
+      userResult.rows[0].wallet_balance || 0
+    );
+
+    if (walletBalance < price) {
+      await pool.query("ROLLBACK");
+
+      return res.status(400).json({
+        success: false,
+        message: "Insufficient wallet balance."
+      });
+    }
+
+    await pool.query(
+      `
+      UPDATE users
+      SET wallet_balance = wallet_balance - $1
+      WHERE id = $2
+      `,
+      [price, req.user.id]
+    );
+
+    await pool.query(
+      `
+      INSERT INTO service_requests
+      (user_id, service, message, status)
+      VALUES ($1, $2, $3, 'pending')
+      `,
+      [
+        req.user.id,
+        service,
+        message || ""
+      ]
+    );
+
+    await pool.query(
+      `
+      INSERT INTO wallet_transactions
+      (user_id, reference, amount, type, status)
+      VALUES ($1, $2, $3, 'debit', 'successful')
+      `,
+      [
+        req.user.id,
+        `SERVICE-${req.user.id}-${Date.now()}`,
+        price
+      ]
+    );
+
+    await pool.query("COMMIT");
+
+    res.json({
+      success: true,
+      message: "Service payment successful.",
+      amount: price
+    });
+
+  } catch (error) {
+    try {
+      await pool.query("ROLLBACK");
+    } catch {}
+
+    console.error(
+      "Service payment error:",
+      error.message
+    );
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to process service payment."
+    });
+  }
+});
+// ===============================
 // CONTACT FORM
 // ===============================
 
