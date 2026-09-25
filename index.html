@@ -231,67 +231,96 @@
   </div>
 </section>
       <section id="requests" class="section">
-        <div class="section-head"><div><p class="eyebrow">REQUESTS</p><h2>Recent requests</h2></div></div>
-        <div class="empty-card"><div class="empty-icon">◷</div><h3>No requests yet</h3><p>Your service requests will appear here after you submit one.</p></div>
-        <div id="requestsList"></div>
-      </section>
+  <div class="section-head">
+    <div>
+      <p class="eyebrow">REQUESTS</p>
+      <h2>My requests</h2>
+      <p class="muted">Track the services you have submitted through IB System Consult.</p>
+    </div>
+  </div>
+
+  <div class="empty-card">
+    <div class="empty-icon">◷</div>
+    <h3>No requests yet</h3>
+    <p>Your service requests will appear here after you submit one.</p>
+  </div>
+
+  <div id="requestsList"></div>
+</section>
+
+
 <section id="adminDashboard" class="section">
   <div class="section-head">
     <div>
-      <p class="eyebrow">ADMIN</p>
+      <p class="eyebrow">ADMINISTRATION</p>
       <h2>Admin Dashboard</h2>
+      <p class="muted">Monitor customers and manage submitted service requests.</p>
     </div>
   </div>
 
   <div class="account-grid">
+
     <div class="account-card">
-      <span class="muted">Total Customers</span>
+      <span class="account-label">TOTAL CUSTOMERS</span>
       <strong id="adminTotalCustomers">0</strong>
     </div>
 
     <div class="account-card">
-      <span class="muted">Total Requests</span>
+      <span class="account-label">TOTAL REQUESTS</span>
       <strong id="adminTotalRequests">0</strong>
     </div>
 
     <div class="account-card">
-      <span class="muted">Pending</span>
+      <span class="account-label">PENDING</span>
       <strong id="adminPendingRequests">0</strong>
     </div>
 
     <div class="account-card">
-      <span class="muted">Processing</span>
+      <span class="account-label">PROCESSING</span>
       <strong id="adminProcessingRequests">0</strong>
     </div>
 
     <div class="account-card">
-      <span class="muted">Completed</span>
+      <span class="account-label">COMPLETED</span>
       <strong id="adminCompletedRequests">0</strong>
     </div>
+
   </div>
 
-  <div id="adminRequestsList">
-    <div class="empty-card">
-      <div class="empty-icon">▣</div>
-      <h3>Loading requests...</h3>
-      <p>Customer service requests will appear here.</p>
+  <div class="admin-panel">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">SERVICE ACTIVITY</p>
+        <h2>Customer requests</h2>
+      </div>
     </div>
-  </div>
-    <div class="section-head" style="margin-top: 32px;">
-    <div>
-      <p class="eyebrow">CUSTOMERS</p>
-      <h2>Registered Customers</h2>
+
+    <div id="adminRequestsList">
+      <div class="empty-card">
+        <div class="empty-icon">▣</div>
+        <h3>Loading requests...</h3>
+        <p>Customer service requests will appear here.</p>
+      </div>
     </div>
   </div>
 
-  <div id="adminCustomersList">
-    <div class="empty-card">
-      <div class="empty-icon">👥</div>
-      <h3>Loading customers...</h3>
-      <p>Registered customers will appear here.</p>
+  <div class="admin-panel">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">CUSTOMERS</p>
+        <h2>Registered customers</h2>
+      </div>
+    </div>
+
+    <div id="adminCustomersList">
+      <div class="empty-card">
+        <div class="empty-icon">👥</div>
+        <h3>Loading customers...</h3>
+        <p>Registered customers will appear here.</p>
+      </div>
     </div>
   </div>
-</section>
+      </section>
       <section id="transactions" class="section">
         <div class="section-head"><div><p class="eyebrow">WALLET</p><h2>Recent transactions</h2></div></div>
         <div class="empty-card"><div class="empty-icon">₦</div><h3>No transactions yet</h3><p>Wallet funding and service payments will be listed here.</p></div>
