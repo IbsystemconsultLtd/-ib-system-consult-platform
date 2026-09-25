@@ -80,9 +80,35 @@
       </section>
 
       <section class="stats">
-        <div class="stat-card"><span>Wallet balance</span><strong id="overviewWallet">₦0.00</strong><button class="text-btn" data-modal="fundModal">Fund wallet →</button></div>
-        <div class="stat-card"><span>Open requests</span><strong>0</strong><small>Nothing pending</small></div>
-        <div class="stat-card"><span>Completed</span><strong>0</strong><small>Your completed requests</small></div>
+
+  <div class="stat-card dashboard-wallet">
+    <span>Wallet balance</span>
+    <strong id="overviewWallet">₦0.00</strong>
+    <button class="text-btn" data-modal="fundModal">Fund wallet →</button>
+  </div>
+
+  <div class="stat-card">
+    <span>Open requests</span>
+    <strong id="overviewOpenRequests">0</strong>
+    <small>Requests currently being handled</small>
+  </div>
+
+  <div class="stat-card">
+    <span>Completed</span>
+    <strong id="overviewCompletedRequests">0</strong>
+    <small>Your completed requests</small>
+  </div>
+
+  <div class="stat-card dashboard-action">
+    <span>Need assistance?</span>
+    <strong>We're here to help</strong>
+    <a href="https://wa.me/2349016587081"
+       target="_blank"
+       rel="noopener">
+      Chat on WhatsApp →
+    </a>
+  </div>
+
       </section>
 
       <section id="services" class="section">
