@@ -586,14 +586,12 @@ async function loadAdminRequests() {
     }
 
     if (!data.requests || data.requests.length === 0) {
-  if (requestsEmpty) requestsEmpty.style.display = "block";
-
-  requestsList.innerHTML = "";
-  return;
-}
-
-if (requestsEmpty) requestsEmpty.style.display = "none";
-      
+      adminList.innerHTML = `
+        <div class="empty-state">
+          <h3>No service requests</h3>
+          <p>Customer requests will appear here.</p>
+        </div>
+      `;
 
       return;
     }
@@ -618,22 +616,22 @@ if (requestsEmpty) requestsEmpty.style.display = "none";
               <h3>${request.service}</h3>
             </div>
 
-           <select
-  class="request-status-select"
-  data-request-id="${request.id}"
->
-  <option value="pending" ${request.status === "pending" ? "selected" : ""}>
-    Pending
-  </option>
+            <select
+              class="request-status-select"
+              data-request-id="${request.id}"
+            >
+              <option value="pending" ${request.status === "pending" ? "selected" : ""}>
+                Pending
+              </option>
 
-  <option value="processing" ${request.status === "processing" ? "selected" : ""}>
-    Processing
-  </option>
+              <option value="processing" ${request.status === "processing" ? "selected" : ""}>
+                Processing
+              </option>
 
-  <option value="completed" ${request.status === "completed" ? "selected" : ""}>
-    Completed
-  </option>
-</select>
+              <option value="completed" ${request.status === "completed" ? "selected" : ""}>
+                Completed
+              </option>
+            </select>
 
             <p>${request.message}</p>
 
