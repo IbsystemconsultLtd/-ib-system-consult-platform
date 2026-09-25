@@ -905,6 +905,64 @@ app.get("/api/admin/customers/:id", authRequired, async (req, res) => {
   }
 });
 // ===============================
+// GET WALLET TRANSACTIONS
+// ===============================
+
+app.get("/api/transactions", authRequired, async (req, res) => {
+  try {
+    if (!pool) {
+      return res.status(503).json({
+        success: false,
+        message: "Database is not available.",
+      });
+    }
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS wallet_transactions (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        reference TEXT UNIQUE NOT NULL,
+        amount NUMERIC(12,2) NOT NULL,
+        type TEXT NOT NULL DEFAULT 'credit',
+        status TEXT NOT NULL DEFAULT 'successful',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    const result = await pool.query(
+      `
+      SELECT
+        id,
+        reference,
+        amount,
+        type,
+        status,
+        created_at
+      FROM wallet_transactions
+      WHERE user_id = $1
+      ORDER BY created_at DESC
+      `,
+      [req.user.id]
+    );
+
+    res.json({
+      success: true,
+      transactions: result.rows,
+    });
+
+  } catch (error) {
+    console.error(
+      "Get transactions error:",
+      error.message
+    );
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to load transactions.",
+    });
+  }
+});
+// ===============================
 // CONTACT FORM
 // ===============================
 
