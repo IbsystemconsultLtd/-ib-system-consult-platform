@@ -498,7 +498,27 @@ const overviewCompletedRequests = $("#overviewCompletedRequests");
       `;
       return;
     }
+const openRequests = data.requests
+  ? data.requests.filter(
+      request =>
+        request.status === "pending" ||
+        request.status === "processing"
+    ).length
+  : 0;
 
+const completedRequests = data.requests
+  ? data.requests.filter(
+      request => request.status === "completed"
+    ).length
+  : 0;
+
+if (overviewOpenRequests) {
+  overviewOpenRequests.textContent = openRequests;
+}
+
+if (overviewCompletedRequests) {
+  overviewCompletedRequests.textContent = completedRequests;
+}
     if (!data.requests || data.requests.length === 0) {
       if (requestsEmpty) requestsEmpty.style.display = "block";
 
