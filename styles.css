@@ -722,3 +722,79 @@ nav{display:grid;gap:7px}.nav-link{padding:13px 14px;border-radius:10px;color:#5
     font-size:15px;
   }
     }
+/* =========================
+   REQUESTS & ADMIN
+   ========================= */
+
+.empty-card{
+  background:#fff;
+  border:1px solid #e6ebf2;
+  border-radius:18px;
+  padding:38px 24px;
+  text-align:center;
+  box-shadow:0 8px 25px rgba(16,33,58,.05);
+}
+
+.empty-icon{
+  width:52px;
+  height:52px;
+  margin:0 auto 15px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:15px;
+  background:#eef4ff;
+  color:var(--brand);
+  font-size:22px;
+}
+
+.empty-card h3{
+  margin:0 0 8px;
+  color:var(--ink);
+  font-size:17px;
+}
+
+.empty-card p{
+  margin:0;
+  color:#68758a;
+  font-size:13px;
+  line-height:1.6;
+}
+
+#requestsList{
+  margin-top:18px;
+}
+
+.admin-panel{
+  margin-top:28px;
+  background:#f8faff;
+  border:1px solid #e6ebf2;
+  border-radius:20px;
+  padding:22px;
+}
+
+.admin-panel .section-head{
+  margin-bottom:18px;
+}
+
+#adminRequestsList,
+#adminCustomersList{
+  margin-top:10px;
+}
+
+#adminRequestsList .empty-card,
+#adminCustomersList .empty-card{
+  box-shadow:none;
+  background:#fff;
+}
+
+@media(max-width:700px){
+  .empty-card{
+    padding:30px 18px;
+  }
+
+  .admin-panel{
+    padding:16px;
+    border-radius:17px;
+  }
+}
