@@ -193,3 +193,58 @@ nav{display:grid;gap:7px}.nav-link{padding:13px 14px;border-radius:10px;color:#5
   position: relative;
   z-index: 2;
    }
+/* PREMIUM SERVICES SECTION */
+
+#services {
+  margin-top: 34px;
+}
+
+#services .section-head {
+  margin-bottom: 24px;
+}
+
+#services .section-head h2 {
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+}
+
+#services .section-head .muted {
+  font-size: 14px;
+}
+
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.service-card {
+  min-height: 245px;
+  display: flex;
+  flex-direction: column;
+}
+
+.service-card h3 {
+  min-height: 24px;
+}
+
+.service-card p {
+  flex: 1;
+}
+
+@media (max-width: 900px) {
+  .service-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .service-grid {
+    grid-template-columns: 1fr;
+  }
+
+  #services .section-head h2 {
+    font-size: 26px;
+  }
+}
