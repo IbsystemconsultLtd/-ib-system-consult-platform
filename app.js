@@ -598,12 +598,14 @@ async function loadAdminRequests() {
     }
 
     if (!data.requests || data.requests.length === 0) {
-      adminList.innerHTML = `
-        <div class="empty-state">
-          <h3>No service requests</h3>
-          <p>Customer requests will appear here.</p>
-        </div>
-      `;
+  if (requestsEmpty) requestsEmpty.style.display = "block";
+
+  requestsList.innerHTML = "";
+  return;
+}
+
+if (requestsEmpty) requestsEmpty.style.display = "none";
+      
 
       return;
     }
