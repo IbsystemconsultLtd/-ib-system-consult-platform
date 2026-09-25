@@ -953,7 +953,111 @@ if (fundBtn) {
     }
   });
 }
+async function loadTransactions() {
+  const transactionsSection = $("#transactions");
 
+  if (!transactionsSection) return;
+
+  const token = getToken();
+
+  if (!token) {
+    transactionsSection.querySelector(".transaction-empty").innerHTML = `
+      <div class="empty-icon">🔐</div>
+      <h3>Login required</h3>
+      <p>Please log in to view your transactions.</p>
+    `;
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `${API_BASE}/api/transactions`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      transactionsSection.querySelector(".transaction-empty").innerHTML = `
+        <div class="empty-icon">!</div>
+        <h3>Unable to load transactions</h3>
+        <p>${data.message || "Please try again."}</p>
+      `;
+      return;
+    }
+
+    if (!data.transactions || data.transactions.length === 0) {
+      transactionsSection.querySelector(".transaction-empty").innerHTML = `
+        <div class="empty-icon">₦</div>
+        <h3>No transactions yet</h3>
+        <p>Your wallet funding and service payment activity will appear here.</p>
+      `;
+      return;
+    }
+
+    const transactionList = document.createElement("div");
+    transactionList.className = "transaction-list";
+
+    transactionList.innerHTML = data.transactions
+      .map((transaction) => {
+        const date = new Date(
+          transaction.created_at
+        ).toLocaleString();
+
+        const amount = Number(
+          transaction.amount
+        ).toLocaleString("en-NG", {
+          minimumFractionDigits: 2,
+        });
+
+        return `
+          <div class="request-card transaction-card">
+            <div>
+              <span class="muted">Transaction</span>
+              <h3>${transaction.type === "credit" ? "Wallet Funding" : transaction.type}</h3>
+              <small>${date}</small>
+            </div>
+
+            <div>
+              <strong>₦${amount}</strong>
+              <p class="muted">${transaction.status}</p>
+            </div>
+
+            <small>Reference: ${transaction.reference}</small>
+          </div>
+        `;
+      })
+      .join("");
+
+    const emptyCard =
+      transactionsSection.querySelector(".transaction-empty");
+
+    if (emptyCard) {
+      emptyCard.replaceWith(transactionList);
+    }
+
+  } catch (error) {
+    console.error(
+      "Transactions error:",
+      error
+    );
+
+    const emptyCard =
+      transactionsSection.querySelector(".transaction-empty");
+
+    if (emptyCard) {
+      emptyCard.innerHTML = `
+        <div class="empty-icon">!</div>
+        <h3>Connection error</h3>
+        <p>Unable to connect to the server.</p>
+      `;
+    }
+  }
+}
 // ===============================
 // INITIALIZE
 // ===============================
