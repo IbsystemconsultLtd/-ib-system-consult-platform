@@ -1064,6 +1064,7 @@ async function loadTransactions() {
 
 loadAccountDashboard();
 loadMyRequests();
+loadTransactions();
 document.addEventListener("change", async (event) => {
   if (!event.target.classList.contains("request-status-select")) {
     return;
