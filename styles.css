@@ -870,3 +870,103 @@ nav{display:grid;gap:7px}.nav-link{padding:13px 14px;border-radius:10px;color:#5
     width:100%;
   }
 }
+/* =========================
+   PROFESSIONAL TOPBAR
+   ========================= */
+
+.topbar{
+  min-height:76px;
+  display:flex;
+  align-items:center;
+  gap:18px;
+  padding:14px 0 20px;
+}
+
+.topbar-title{
+  flex:1;
+  min-width:0;
+}
+
+.topbar-title h1{
+  margin:4px 0 0;
+  color:var(--ink);
+  font-size:24px;
+  line-height:1.2;
+  letter-spacing:-.4px;
+}
+
+.top-actions{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.icon-btn{
+  width:40px;
+  height:40px;
+  border:1px solid #e1e7ef;
+  background:#fff;
+  border-radius:11px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+
+.icon-btn:hover{
+  background:#f4f7fb;
+}
+
+.top-actions .outline-btn{
+  padding:10px 15px;
+  border-radius:10px;
+  font-weight:800;
+}
+
+.avatar{
+  width:40px;
+  height:40px;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#eef4ff;
+  color:var(--brand);
+  font-weight:900;
+  border:1px solid #dbe6f7;
+}
+
+@media(max-width:700px){
+  .topbar{
+    gap:10px;
+    padding-bottom:16px;
+  }
+
+  .topbar-title h1{
+    font-size:17px;
+  }
+
+  .topbar-title .eyebrow{
+    font-size:9px;
+  }
+
+  .top-actions{
+    gap:6px;
+  }
+
+  .icon-btn{
+    width:36px;
+    height:36px;
+  }
+
+  .top-actions .outline-btn{
+    padding:8px 11px;
+    font-size:12px;
+  }
+
+  .avatar{
+    width:36px;
+    height:36px;
+    border-radius:10px;
+  }
+}
