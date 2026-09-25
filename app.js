@@ -460,7 +460,8 @@ if (loginForm) {
 async function loadMyRequests() {
   const requestsList = $("#requestsList");
   const requestsEmpty = $("#requestsEmpty");
-
+const overviewOpenRequests = $("#overviewOpenRequests");
+const overviewCompletedRequests = $("#overviewCompletedRequests");
   if (!requestsList) return;
 
   const token = getToken();
