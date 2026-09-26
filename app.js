@@ -758,6 +758,119 @@ async function loadAdminStats() {
   }
 }
 // ===============================
+// SERVICE PRICES & SUB-SERVICES
+// ===============================
+
+const serviceOptions = {
+  "NIN MODIFICATION": {
+    "Name modification": 8000,
+    "Date of birth modification": 60000,
+    "Phone number modification": 8000,
+    "Address modification": 9000,
+    "Gender modification": 25000,
+    "State of origin modification": 26000
+  },
+
+  "NIN VALIDATION": {
+    "No Record Found": 2500,
+    "Update Record": 2500,
+    "Validate Modification": 2500,
+    "V-NIN Validation": 2500,
+    "Photograph Error": 2500,
+    "Bypass NIN": 2500
+  },
+
+  "BVN MODIFICATION": {
+    "Name modification": 12000,
+    "Date of birth modification": 12000,
+    "Phone number modification": 12000,
+    "Address modification": 12000,
+    "Gender modification": 12000,
+    "State of origin modification": 12000
+  },
+
+  "NIN ENROLLMENT": {
+    "Children": 15000,
+    "Adult": 20000
+  },
+
+  "JAMB": {
+    "JAMB Admission Letter": 2500,
+    "JAMB Result Letter": 2500
+  }
+};
+
+const serviceSelect = $("#contactService");
+const subServiceSelect = $("#contactSubService");
+const servicePrice = $("#servicePrice");
+const servicePriceAmount = $("#servicePriceAmount");
+
+function updateSubServices() {
+  if (!serviceSelect || !subServiceSelect) return;
+
+  const service = serviceSelect.value;
+  const options = serviceOptions[service] || {};
+
+  subServiceSelect.innerHTML = `
+    <option value="">Select a sub-service</option>
+  `;
+
+  Object.keys(options).forEach((subService) => {
+    const option = document.createElement("option");
+
+    option.value = subService;
+    option.textContent = subService;
+
+    subServiceSelect.appendChild(option);
+  });
+
+  if (servicePrice) {
+    servicePrice.style.display = "none";
+  }
+
+  if (servicePriceAmount) {
+    servicePriceAmount.textContent = "₦0";
+  }
+}
+
+function updateServicePrice() {
+  if (!serviceSelect || !subServiceSelect) return;
+
+  const service = serviceSelect.value;
+  const subService = subServiceSelect.value;
+  const price = serviceOptions[service]?.[subService];
+
+  if (!price) {
+    if (servicePrice) {
+      servicePrice.style.display = "none";
+    }
+    return;
+  }
+
+  if (servicePriceAmount) {
+    servicePriceAmount.textContent =
+      `₦${price.toLocaleString("en-NG")}`;
+  }
+
+  if (servicePrice) {
+    servicePrice.style.display = "block";
+  }
+}
+
+if (serviceSelect) {
+  serviceSelect.addEventListener(
+    "change",
+    updateSubServices
+  );
+}
+
+if (subServiceSelect) {
+  subServiceSelect.addEventListener(
+    "change",
+    updateServicePrice
+  );
+}
+// ===============================
 // SERVICE REQUEST BUTTONS
 // ===============================
 
