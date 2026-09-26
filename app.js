@@ -924,6 +924,107 @@ if (contactForm) {
     const phone = $("#contactPhone")?.value.trim();
     const email = $("#contactEmail")?.value.trim();
     const service = $("#contactService")?.value;
+    const subService = $("#contactSubService")?.value;
+    const message = $("#contactMessage")?.value.trim();
+
+    const amount =
+      serviceOptions[service]?.[subService];
+
+    if (!name || !phone || !service || !subService || !amount || !message) {
+      toast("Please complete all required fields.");
+      return;
+    }
+
+    const submitButton = $("#contactSubmit");
+
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.textContent = "Processing Payment...";
+    }
+
+    try {
+      const response = await fetch(
+        `${API_BASE}/api/pay-service`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            service: `${service} - ${subService}`,
+            amount,
+            message: `Name: ${name}
+Phone: ${phone}
+Email: ${email || "Not provided"}
+
+${message}`,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        toast(
+          data.message ||
+          "Unable to process service payment."
+        );
+        return;
+      }
+
+      toast(
+        `Payment successful: ₦${Number(amount).toLocaleString("en-NG")}`
+      );
+
+      contactForm.reset();
+
+      if (servicePrice) {
+        servicePrice.style.display = "none";
+      }
+
+      if (servicePriceAmount) {
+        servicePriceAmount.textContent = "₦0";
+      }
+
+      const modal = $("#contactModal");
+
+      if (modal) {
+        modal.classList.remove("show");
+      }
+
+      await loadMyRequests();
+      await loadAccount();
+
+    } catch (error) {
+      console.error(
+        "Service payment error:",
+        error
+      );
+
+      toast("Unable to process service payment.");
+    } finally {
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = "Submit Request";
+      }
+    }
+  });
+}
+    event.preventDefault();
+
+    const token = getToken();
+
+    if (!token) {
+      authModal?.classList.add("show");
+      toast("Please log in before submitting a service request.");
+      return;
+    }
+
+    const name = $("#contactName")?.value.trim();
+    const phone = $("#contactPhone")?.value.trim();
+    const email = $("#contactEmail")?.value.trim();
+    const service = $("#contactService")?.value;
     const message = $("#contactMessage")?.value.trim();
 
     if (!name || !phone || !service || !message) {
