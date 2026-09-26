@@ -994,7 +994,7 @@ ${message}`,
       }
 
       await loadMyRequests();
-      await loadAccount();
+      await loadAccountDashboard();
 
     } catch (error) {
       console.error(
