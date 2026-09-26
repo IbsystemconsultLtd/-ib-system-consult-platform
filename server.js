@@ -610,21 +610,16 @@ app.get("/api/admin/requests", authRequired, async (req, res) => {
     await ensureRequestsTable();
 
     const result = await pool.query(`
-      SELECT
-        service_requests.id,
-        service_requests.service,
-        service_requests.message,
-        service_requests.status,
-        service_requests.created_at,
-        users.name,
-        users.email,
-        users.phone
-      FROM service_requests
-      JOIN users
-        ON users.id = service_requests.user_id
-      ORDER BY service_requests.created_at DESC
-    `);
-
+      
+SELECT
+  id,
+  name,
+  email,
+  phone,
+  role,
+  wallet_balance,
+  created_at
+FROM users
     res.json({
       success: true,
       requests: result.rows,
