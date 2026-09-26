@@ -1316,7 +1316,15 @@ if (callBtn) {
 }
     $("#profileCustomerJoined").textContent =
       new Date(customer.created_at).toLocaleDateString();
+const profileCustomerWallet = $("#profileCustomerWallet");
 
+if (profileCustomerWallet) {
+  profileCustomerWallet.textContent =
+    `₦${Number(customer.wallet_balance || 0).toLocaleString("en-NG", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })}`;
+      }
     const requestsBox =
       $("#profileCustomerRequests");
 
