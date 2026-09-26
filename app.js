@@ -1426,6 +1426,10 @@ async function loadAdminCustomers() {
             <div>
               <span class="muted">Customer</span>
               <h3>${customer.name}</h3>
+              <p><strong>Wallet:</strong> ₦${Number(customer.wallet_balance || 0).toLocaleString("en-NG", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2
+})}</p>
               <p>${customer.email}</p>
               <p>${customer.phone}</p>
             </div>
