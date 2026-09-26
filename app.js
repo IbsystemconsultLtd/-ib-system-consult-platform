@@ -896,7 +896,8 @@ document
         $("#contactService");
 
       if (serviceSelect && service) {
-        serviceSelect.value = service;
+  serviceSelect.value = service;
+  updateSubServices();
       }
     });
   });
