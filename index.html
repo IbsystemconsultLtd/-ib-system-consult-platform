@@ -513,22 +513,39 @@
 
       <label>
         Service
-        <select id="contactService" required>
-          <option value="">Select a service</option>
-          <option value="NIN VERIFY">NIN VERIFY</option>
-<option value="BVN VERIFY">BVN VERIFY</option>
-<option value="NIN MODIFICATION">NIN MODIFICATION</option>
-<option value="NIN VALIDATION">NIN VALIDATION</option>
-<option value="PERSONALISATION">PERSONALISATION</option>
-<option value="BVN MODIFICATION">BVN MODIFICATION</option>
-<option value="SELF SERVICE DELINK">SELF SERVICE DELINK</option>
-<option value="NIN ENROLLMENT">NIN ENROLLMENT</option>
-<option value="BVN RETRIEVAL">BVN RETRIEVAL</option>
-<option value="JAMB">JAMB</option>
-<option value="IPE CLEARANCE">IPE CLEARANCE</option>
-<option value="BIRTH CERTIFICATE">BIRTH CERTIFICATE</option>
-<option value="STATE OF ORIGIN CERTIFICATE">STATE OF ORIGIN CERTIFICATE</option>
-<option value="RECOMMENDATION LETTER">RECOMMENDATION LETTER</option>
+        <label>
+  Service
+  <select id="contactService" required>
+    <option value="">Select a service</option>
+
+    <option value="NIN MODIFICATION">NIN Modification</option>
+    <option value="NIN VALIDATION">NIN Validation</option>
+    <option value="BVN MODIFICATION">BVN Modification</option>
+    <option value="NIN ENROLLMENT">NIN Enrollment</option>
+    <option value="JAMB">JAMB Services</option>
+
+    <option value="NIN VERIFY">NIN Verification</option>
+    <option value="BVN VERIFY">BVN Verification</option>
+    <option value="PERSONALISATION">NIN Personalisation</option>
+    <option value="SELF SERVICE DELINK">Self-Service Delink</option>
+    <option value="BVN RETRIEVAL">BVN Retrieval</option>
+    <option value="IPE CLEARANCE">IPE Clearance</option>
+    <option value="BIRTH CERTIFICATE">Birth Certificate</option>
+    <option value="STATE OF ORIGIN CERTIFICATE">State of Origin Certificate</option>
+    <option value="RECOMMENDATION LETTER">Recommendation Letter</option>
+  </select>
+</label>
+
+<label>
+  Sub-service
+  <select id="contactSubService" required>
+    <option value="">Select a sub-service</option>
+  </select>
+</label>
+
+<div id="servicePrice" class="service-price" style="display:none;">
+  Price: <strong id="servicePriceAmount">₦0</strong>
+</div>
         </select>
       </label>
 
