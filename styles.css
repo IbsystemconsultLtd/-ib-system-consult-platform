@@ -1349,3 +1349,90 @@ nav{display:grid;gap:7px}.nav-link{padding:13px 14px;border-radius:10px;color:#5
     font-size: 26px;
   }
   }
+/* =========================================
+   PROFESSIONAL CUSTOMER PROFILE
+   ========================================= */
+
+#customerProfileModal .modal-box {
+  max-width: 680px;
+  border-radius: 24px;
+  padding: 30px;
+}
+
+#customerProfileModal h2 {
+  margin-bottom: 24px;
+  color: #10213a;
+}
+
+#customerProfileModal .account-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+#customerProfileModal .account-card {
+  padding: 18px;
+  border: 1px solid #e8ecf2;
+  border-radius: 16px;
+  background: #fafbfd;
+}
+
+#customerProfileModal .account-card span {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #667085;
+}
+
+#customerProfileModal .account-card strong {
+  display: block;
+  font-size: 16px;
+  color: #10213a;
+  word-break: break-word;
+}
+
+#customerProfileModal #profileCustomerWallet {
+  font-size: 20px;
+}
+
+#customerProfileActions {
+  padding-top: 4px;
+}
+
+#customerProfileActions .primary-btn {
+  min-width: 130px;
+  text-align: center;
+}
+
+#customerProfileModal .request-card {
+  padding: 16px;
+  margin-bottom: 12px;
+  border: 1px solid #e8ecf2;
+  border-radius: 14px;
+  background: #fafbfd;
+}
+
+#customerProfileModal .request-card h3 {
+  margin: 0 0 6px;
+  color: #10213a;
+}
+
+@media (max-width: 600px) {
+  #customerProfileModal .modal-box {
+    padding: 22px;
+    border-radius: 20px;
+  }
+
+  #customerProfileModal .account-grid {
+    grid-template-columns: 1fr;
+  }
+
+  #customerProfileActions {
+    flex-direction: column;
+  }
+
+  #customerProfileActions .primary-btn {
+    width: 100%;
+  }
+}
