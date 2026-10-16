@@ -2406,3 +2406,96 @@ padding: 14px;
     font-size: 13px;
   }
 }
+/* IB SYSTEM CONSULT — PROFESSIONAL SERVICE CARDS */
+
+#services {
+  padding-top: 12px;
+}
+
+#services .section-head {
+  margin-bottom: 20px;
+}
+
+#services .service-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  align-items: stretch;
+}
+
+#services .service-card {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+  padding: 16px 13px !important;
+  background: #fff !important;
+  border: 1px solid #e1ede5 !important;
+  border-radius: 18px !important;
+  box-shadow: 0 5px 16px rgba(24, 53, 43, 0.045);
+}
+
+#services .service-icon {
+  width: 46px;
+  height: 46px;
+  min-width: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 13px;
+  border-radius: 14px;
+  background: #e8f7ef;
+  color: #087f5b;
+  font-size: 23px;
+}
+
+#services .service-card h3 {
+  min-height: auto;
+  margin: 0 0 9px;
+  color: #18352b;
+  font-size: 14px;
+  line-height: 1.45;
+  font-weight: 750;
+}
+
+#services .service-card p {
+  flex: 1;
+  margin: 0 0 15px;
+  color: #718078;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+#services .service-card .outline-btn {
+  width: 100%;
+  margin-top: auto;
+  padding: 11px 7px;
+  border-radius: 11px !important;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+}
+
+#services .service-card:hover {
+  border-color: #b6dec5 !important;
+  box-shadow: 0 8px 22px rgba(8, 127, 91, 0.09);
+}
+
+@media (max-width: 380px) {
+  #services .service-grid {
+    gap: 9px;
+  }
+
+  #services .service-card {
+    padding: 12px 10px !important;
+  }
+
+  #services .service-card h3 {
+    font-size: 13px;
+  }
+
+  #services .service-card p {
+    font-size: 11px;
+  }
+}
